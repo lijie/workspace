@@ -1,0 +1,351 @@
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(c-basic-offset 4)
+ '(c-strict-syntax-p t)
+ '(c-tab-always-indent nil)
+ '(column-number-mode t)
+; '(cua-mode nil)
+; '(display-battery-mode nil)
+; '(display-time-mode nil)
+ '(history-file "~/emacs-history.el")
+ '(pop3-leave-mail-on-server t)
+ '(pop3-maildrop "lijay")
+ '(pop3-mailhost "pop3.126.com")
+ '(pop3-password-required t)
+ '(project-file "~/emacs-projects.el")
+; '(show-paren-mode t nil (paren))
+ '(standard-indent 4)
+ '(tool-bar-mode nil nil (tool-bar))
+ '(transient-mark-mode t))
+;;(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+;; '(default ((t (:stipple nil :background "black" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :family "outline-courier new"))))
+;; '(cursor ((t (:background "red")))))
+
+;(require 'ido)
+;(ido-mode t)
+
+;; apointment enable
+(setq appt-issue-message t)
+
+;; line space
+(setq-default line-spacing 4)
+;;(set-default-fonts "-xos4-terminus-medium-r-normal--16-160-72-72-c-80-iso10646-1")
+;(set-frame-font "-bitstream-bitstream vera sans mono-medium-o-normal--0-0-0-0-m-0-iso10646-1")
+
+(setq default-fill-column 120)
+
+;(setq scroll-margin 3
+;      scroll-conservatively 10000)
+
+;;no backup file
+(setq make-backup-files nil)
+
+(add-hook 'c-mode-hook '(lambda ()(c-set-style "linux")))
+;(add-hook 'c++-mode-hook '(lambda()(c-set-style "linux")))
+(add-hook 'c++-mode-hook 'google-set-c-style)
+(add-hook 'c++-mode-hook '(lambda () (gtags-mode 1)))
+(add-hook 'c-mode-hook '(lambda () (gtags-mode 1)))
+
+
+;; keep silent
+(setq visible-bell nil)
+
+;; display time
+(display-time)
+
+;; key binding
+(global-set-key "\M-o" 'other-window)
+(global-set-key "\C-c\C-c" 'comment-region)
+(global-set-key "\C-c\C-g" 'goto-line)
+(global-set-key "\C-x\C-b" 'bs-show)
+;(global-set-key (kbd "C-x C-b") 'ibuffer-bs-show)
+(global-set-key "\M-p"  'bs-cycle-previous)
+(global-set-key "\M-n"  'bs-cycle-next)
+(global-set-key "\M-a"  'beginning-of-line-text)
+(global-set-key "\C-c\h"  'speedbar-get-focus)
+(global-set-key "\C-c\i"  'imenu)
+(global-set-key "\C-c\C-f"  'grep-find)
+(global-set-key "\C-c\l"  'align)
+(global-set-key "\C-c\f"  'find-file-at-point)
+(global-set-key "\C-cgs"  'gtags-find-symbol)
+(global-set-key "\C-cgr"  'gtags-find-rtag)
+(global-set-key "\C-cgf"  'gtags-find-file)
+(setq-default kill-whole-line t)
+(setq align-to-tab-stop nil)
+
+;Syntax Highlighting
+(cond ((fboundp 'global-font-lock-mode)
+;; Load the font-lock package.
+(require 'font-lock)
+;; Maximum colors
+(setq font-lock-maximum-decoration t)
+;; Turn on font-lock in all modes that support it
+(global-font-lock-mode t)))
+
+;; (require 'php-mode)
+;(require 'xcscope)
+(load "~/xcscope.el")
+;(load "~/gtags.el")
+;(require 'history)
+(load "~/google-c-style.el")
+(load "~/markdown-mode.el")
+
+(add-to-list 'load-path "~/" t)
+(require 'go-mode-load)
+
+; emacs title
+(setq frame-title-format "emacs@%b")
+
+; display column number
+(setq column-number-mode t)
+
+; 
+(setq inhibit-startup-message t)
+
+;
+(show-paren-mode t)
+(setq show-paren-style 'parentheses)
+
+;Hightling Marked Area
+(transient-mark-mode t)
+
+;Set Default-mode
+(setq default-major-mode 'text-mode) 
+
+;tabºÍindent
+
+(setq default-tab-width 8)
+
+(defun set-default-tab-width (size)
+  "Set tab size"
+  (interactive "nPlease input the tab size:")
+  (setq default-tab-width size)
+  (message "The tab size is %d" size))
+
+;(setq default-indet-tab-mode nil)
+(setq default-indet-tab-mode t)
+
+(defun insert-current_time ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time))))
+
+;; (defun insert-doxygen ()
+;;   (interactive)
+;;   (insert "/**\n * \n * \@param \n * \@return \n */")
+;;   (previous-line 3))
+;; (define-key global-map (kbd "C-c d") 'insert-doxygen)
+
+
+(defun wy-go-to-char (n char)
+  "Move forward to Nth occurence of CHAR.
+Typing `wy-go-to-char-key' again will move forwad to the next Nth
+occurence of CHAR."
+  (interactive "p\ncGo to char: ")
+  (search-forward (string char) nil nil n)
+  (while (char-equal (read-char)
+		     char)
+    (search-forward (string char) nil nil n))
+  (setq unread-command-events (list last-input-event)))
+(define-key global-map (kbd "C-c a") 'wy-go-to-char)
+
+
+;;;;;;;;;;;;;;;;;;;;; move line ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(global-set-key   [C-S-up]        'my-move-line-up)
+(global-set-key   [C-S-down]      'my-move-line-down)
+(global-set-key   [C-M-down]      'my-dup-line-down)
+
+(global-set-key [C-M-left] (function (lambda()(interactive)
+           (enlarge-window 10))))
+(global-set-key [C-M-right] (function (lambda()(interactive)
+           (enlarge-window-horizontally 10))))
+
+;; copy line
+(defun kill-ring-save-current-line ()
+  "copy the current non-empty line to the kill-ring"
+  (interactive)
+  (unless (equal (line-beginning-position) (line-end-position))
+    (kill-ring-save (line-beginning-position) (line-end-position))))
+
+;; bind it C-;
+(global-set-key [(control \;)] 'kill-ring-save-current-line)
+;(define-key global-map (kbd "C-c ;") 'kill-ring-save-current-line)
+
+(defun my-move-region-up (p)
+  "move current region up"
+  (interactive "p")
+  (let ((c (current-column)))
+    (beginning-of-line)
+    (kill-region )
+;    (previous-line p)
+ ;   (beginning-of-line)
+;    (yank)
+;    (previous-line 1)
+;    (move-to-column c))
+
+))
+
+(defun my-move-line-up (p)
+  "move current line up"
+  (interactive "p")
+  (let ((c (current-column)))
+    (beginning-of-line)
+    (kill-line 1)
+    (previous-line p)
+    (beginning-of-line)
+    (yank)
+    (previous-line 1)
+    (move-to-column c)))
+
+(defun my-move-line-down (p)
+  "move current line down"
+  (interactive "p")
+  (let ((c (current-column)))
+    (beginning-of-line)
+    (kill-line 1)
+    (next-line p)
+    (beginning-of-line)
+    (yank)
+    (previous-line 1)
+    (move-to-column c)))
+
+(defun my-dup-line-down ()
+  "duplicate this line at next line"
+  (interactive)
+  (let ((c (current-column)))
+    (kill-ring-save-current-line)
+    (end-of-line)
+    (newline)
+    (yank)
+    (move-to-column c)))
+
+(defvar ue-selection-last-point nil
+  "Indicates whether to kill-append or kill-new")
+(defvar ue-selection-total-lines 0
+  "Total number of lines appended so far to the last item in kill-ring")
+
+(defun ue-selection-update-cont ()
+  "Update `ue-selection-last-point' variable"
+  (if (and this-command
+           (string= (format "%s" this-command)
+                    "ue-select-line-down-continued"))
+      (setq ue-selection-last-point (point))
+    (setq ue-selection-total-lines 0)
+    (setq ue-selection-last-point  nil)))
+
+(add-hook 'post-command-hook 'ue-selection-update-cont)
+
+(defun ue-select-line-down-continued ()
+  "like Shift+down in UltraEdit, but do no selection.
+;; Just put these continuous lines all toghether as a new item in kill-ring.
+;; Messages will appear in minibuffer telling you how many lines were copied.
+;; Continuous commands with no interruption append new lines to the item.
+;; Any non-ue-select-line-down-continued command will stop gathering new lines
+;; and make a new item in kill-ring.
+
+;; post-command-hook is used in detecting the continuity of this command.
+;; check `ue-selection-update-cont' and `post-command-hook'."
+  (interactive)
+  (let ((s (point)))
+    (setq next-line-add-newlines t)
+    (next-line 1)
+    (setq next-line-add-newlines nil)
+    (if (and ue-selection-last-point
+             (= (save-excursion
+                  (when (> (count-lines (point-min) (point)) 1)
+                    (previous-line 1))
+                  (point))
+                ue-selection-last-point))
+        (progn
+          (kill-append (buffer-substring s (point)) nil)
+          (setq ue-selection-total-lines (1+ ue-selection-total-lines))
+          (message (format "%s lines copied" ue-selection-total-lines)))
+      (kill-new (buffer-substring s (point)))
+      (message "1 line copied")
+      ;; some errors will cause post-command-hook deletion
+      ;; so add-hook every time after we add the first line
+      (add-hook 'post-command-hook 'ue-selection-update-cont)
+      (setq ue-selection-total-lines 1))))
+
+(defun ue-select-line-down ()
+  "like Shift+down in UltraEdit."
+  (interactive)
+  (let ((s (point)))
+  (setq next-line-add-newlines t)
+  (next-line 1)
+  (setq next-line-add-newlines nil)
+  (kill-new (buffer-substring s (point)))))
+(global-set-key [(shift down)] 'ue-select-line-down-continued)
+
+;(setq todo-file-do "~/todo/do")
+;(setq todo-file-done "~/todo/done")
+;(setq todo-file-top "~/todo/top")
+
+(setq calendar-remove-frame-by-deleting t)
+(setq calendar-week-start-day 1)            ;
+(setq mark-diary-entries-in-calendar t)     ;
+(setq mark-holidays-in-calendar t)        ;
+(setq view-calendar-holidays-initially nil) ;
+
+(setq christian-holidays nil)
+(setq hebrew-holidays nil)
+(setq islamic-holidays nil)
+(setq solar-holidays nil)
+(setq general-holidays '((holiday-float 5 0 2 "Mother's day")
+                         (holiday-fixed 6 1 "Children's day")
+                         (holiday-float 6 0 3 "Father's day")
+                         (holiday-fixed 9 28 "Sunday's birthday")))
+
+;; Support for marking a rectangle of text with highlighting.
+(define-key ctl-x-map "r\C-@" 'rm-set-mark)
+(define-key ctl-x-map [?r ?\C-\ ] 'rm-set-mark)
+(define-key ctl-x-map "r\C-x" 'rm-exchange-point-and-mark)
+(define-key ctl-x-map "r\C-w" 'rm-kill-region)
+(define-key ctl-x-map "r\M-w" 'rm-kill-ring-save)
+(define-key global-map [S-down-mouse-1] 'rm-mouse-drag-region)
+(autoload 'rm-set-mark "rect-mark"
+  "Set mark for rectangle." t)
+(autoload 'rm-exchange-point-and-mark "rect-mark"
+  "Exchange point and mark for rectangle." t)
+(autoload 'rm-kill-region "rect-mark"
+  "Kill a rectangular region and save it in the kill ring." t)
+(autoload 'rm-kill-ring-save "rect-mark"
+  "Copy a rectangular region to the kill ring." t)
+(autoload 'rm-mouse-drag-region "rect-mark"
+  "Drag out a rectangular region with the mouse." t)
+
+(put 'set-goal-column 'disabled nil)
+
+;; useful macros define
+;; mark current line
+(fset 'mark-one-line
+   [?\C-a ?\C-@ end])
+(global-set-key "\C-c\C-m" 'mark-one-line)
+
+; set default font
+;;(set-default-font "-outline-Anonymous-normal-r-normal-normal-13-*-96-96-c-*-iso8859-1")
+
+;; do not use vc-mode, it's too slow
+(setq vc-handled-backends nil)
+
+;; default make command
+(setq compile-command "make -k")
+(global-set-key (kbd "<f5>") 'compile)
+(global-set-key (kbd "<f6>") 'recompile)
+(global-set-key (kbd "<f8>") 'shell)
+
+;(setq flow-control-c-s-replacement ?\035)
+;(enable-flow-control)
+
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))

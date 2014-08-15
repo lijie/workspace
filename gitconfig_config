@@ -1,0 +1,17 @@
+[user]
+	email = eltshanli@gmail.com
+	name = LiJie
+
+[alias]
+	ci = commit
+	st = status
+	co = checkout
+	lc = log ORIG_HEAD.. --stat --no-merge
+	undo = reset --hard
+	br = branch
+	df = diff
+	dc = dif --cached
+	lg = log -p
+	who = shortlog -s --
+	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all --color
+
