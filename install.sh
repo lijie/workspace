@@ -1,5 +1,15 @@
 #!/bin/sh
 
+# install develop tools in debian/ubuntu
+TOOLS="emacs-nox gcc gdb make cmake global screen git"
+TOOLS_LINUX_ONLY="cgvg"
+DEBIAN=`uname -a | grep -i debian`
+if [ -n "$DEBIAN" ]; then
+    sudo apt-get install -y $TOOLS $TOOLS_LINUX_ONLY
+fi
+
+# TODO: install develop tools in Darwin by using MacPorts
+
 cp emacs_config ~/.emacs
 cp screenrc_config ~/.screenrc
 cp gitconfig_config ~/.gitconfig
