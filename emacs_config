@@ -91,14 +91,14 @@
 
 ;; (require 'php-mode)
 ;(require 'xcscope)
-(load "~/xcscope.el")
+;(load "~/xcscope.el")
 ;(load "~/gtags.el")
 ;(require 'history)
 (load "~/google-c-style.el")
 (load "~/markdown-mode.el")
 
 (add-to-list 'load-path "~/" t)
-(require 'go-mode-load)
+(require 'go-mode-autoloads)
 
 ; emacs title
 (setq frame-title-format "emacs@%b")
