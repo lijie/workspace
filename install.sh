@@ -23,8 +23,10 @@ mkdir -p deps
 # install go mode for emacs
 cd deps
 
+GOVER=1.5.1
+
 # install Go
-GOVERSION=`go version 2>/dev/null`
+GOVERSION=`go version | grep $GOVER 2>/dev/null`
 # install Go1.4.2
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go1.4.2.src.tar.gz ]; then
@@ -39,20 +41,21 @@ if [ -z "$GOVERSION" ]; then
     fi
 fi
 export GOROOT_BOOTSTRAP=`pwd`/go1.4.2
-# install Go1.5
+# install Go
 if [ -z "$GOVERSION" ]; then
-    if [ ! -e go1.5.src.tar.gz ]; then
-	wget https://storage.googleapis.com/golang/go1.5.src.tar.gz
+    if [ ! -e go${GOVER}.src.tar.gz ]; then
+	wget https://storage.googleapis.com/golang/go1.5.1.src.tar.gz
     fi
-    if [ ! -d go1.5 ]; then
-	tar zxf go1.5.src.tar.gz
-	mv go go1.5
+    if [ ! -d go${GOVER} ]; then
+	tar zxf go${GOVER}.src.tar.gz
+	mv go go${GOVER}
+	ln -sf go${GOVER} go
     fi
-    if [ ! -e go1.5/bin/go ]; then
-	(cd go1.5/src/; ./make.bash)
+    if [ ! -e go${GOVER}/bin/go ]; then
+	(cd go${GOVER}/src/; ./make.bash)
     fi
 fi
-GOBINPATH=`pwd`/go1.5/bin
+GOBINPATH=`pwd`/go/bin
 export PATH=$GOBINPATH:$PATH
 
 export GOPATH=`pwd`
