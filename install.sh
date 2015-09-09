@@ -44,7 +44,7 @@ export GOROOT_BOOTSTRAP=`pwd`/go1.4.2
 # install Go
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go${GOVER}.src.tar.gz ]; then
-	wget https://storage.googleapis.com/golang/go1.5.1.src.tar.gz
+	wget https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz
     fi
     if [ ! -d go${GOVER} ]; then
 	tar zxf go${GOVER}.src.tar.gz
