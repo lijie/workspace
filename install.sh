@@ -32,6 +32,10 @@ if [ -z "$GOVERSION" ]; then
     if [ ! -e go1.4.2.src.tar.gz ]; then
 	wget https://storage.googleapis.com/golang/go1.4.2.src.tar.gz
     fi
+    if [ ! -e go1.4.2.src.tar.gz ]; then
+	echo "download go1.4.2.src.tar.gz failed"
+	exit 1
+    fi
     if [ ! -d go1.4.2 ]; then
 	tar zxf go1.4.2.src.tar.gz
 	mv go go1.4.2
@@ -46,16 +50,21 @@ if [ -z "$GOVERSION" ]; then
     if [ ! -e go${GOVER}.src.tar.gz ]; then
 	wget https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz
     fi
+    if [ ! -e go${GOVER}.src.tar.gz ]; then
+	echo "download go${GOVER}.src.tar.gz failed"
+	exit 1
+    fi
     if [ ! -d go${GOVER} ]; then
 	tar zxf go${GOVER}.src.tar.gz
 	mv go go${GOVER}
-	ln -sf go${GOVER} go
     fi
+    ln -sf go${GOVER} go
     if [ ! -e go${GOVER}/bin/go ]; then
 	(cd go${GOVER}/src/; ./make.bash)
     fi
 fi
 GOBINPATH=`pwd`/go/bin
+export GO=${GOBINPATH}/go
 export PATH=$GOBINPATH:$PATH
 
 export GOPATH=`pwd`
@@ -71,17 +80,17 @@ cp go-mode.el/go-mode-autoloads.el ~/
 # install godef
 GODEF=github.com/rogpeppe/godef
 if [ -e src/$GODEF ]; then
-    go get -u $GODEF
+    $GO get -u $GODEF
 else
-    go get $GODEF
+    $GO get $GODEF
 fi
 
 # install oracle tools
 ORACLE=golang.org/x/tools/cmd/oracle
 if [ -e src/$ORACLE ]; then
-    go get -u $ORACLE
+    $GO get -u $ORACLE
 else
-    go get $ORACLE
+    $GO get $ORACLE
 fi
        
 # and last
