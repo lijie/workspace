@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # install develop tools in debian/ubuntu
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git"
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget"
 TOOLS_LINUX_ONLY="cgvg sudo systemtap"
 TOOLS_TENCENT="git-svn subversion"
 DEBIAN=`uname -a | grep -i debian`
@@ -10,8 +10,8 @@ if [ -n "$DEBIAN" ]; then
 fi
 
 DARWIN=`uname -a | grep -i darwin`
-if [ -n "$DARWIN"]; then
-    sudo port install "emacs make cmake global screen git subversion"
+if [ -n "$DARWIN" ]; then
+    sudo port install emacs cmake global screen git subversion wget
 fi
 
 cp emacs_config ~/.emacs
