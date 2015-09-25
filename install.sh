@@ -1,14 +1,18 @@
 #!/bin/sh
 
 # install develop tools in debian/ubuntu
-TOOLS="emacs-nox gcc gdb make cmake global screen git"
-TOOLS_LINUX_ONLY="cgvg"
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git"
+TOOLS_LINUX_ONLY="cgvg sudo systemtap"
+TOOLS_TENCENT="git-svn subversion"
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
-    sudo apt-get install -y $TOOLS $TOOLS_LINUX_ONLY
+    sudo apt-get install -y $TOOLS $TOOLS_LINUX_ONLY $TOOLS_TENCENT
 fi
 
-# TODO: install develop tools in Darwin by using MacPorts
+DARWIN=`uname -a | grep -i darwin`
+if [ -n "$DARWIN"]; then
+    sudo port install "emacs make cmake global screen git subversion"
+fi
 
 cp emacs_config ~/.emacs
 cp screenrc_config ~/.screenrc
@@ -27,24 +31,24 @@ GOVER=1.5.1
 
 # install Go
 GOVERSION=`go version | grep $GOVER 2>/dev/null`
-# install Go1.4.2
+# install Go1.4.3
 if [ -z "$GOVERSION" ]; then
-    if [ ! -e go1.4.2.src.tar.gz ]; then
-	wget https://storage.googleapis.com/golang/go1.4.2.src.tar.gz
+    if [ ! -e go1.4.3.src.tar.gz ]; then
+	wget https://storage.googleapis.com/golang/go1.4.3.src.tar.gz
     fi
-    if [ ! -e go1.4.2.src.tar.gz ]; then
-	echo "download go1.4.2.src.tar.gz failed"
+    if [ ! -e go1.4.3.src.tar.gz ]; then
+	echo "download go1.4.3.src.tar.gz failed"
 	exit 1
     fi
-    if [ ! -d go1.4.2 ]; then
-	tar zxf go1.4.2.src.tar.gz
-	mv go go1.4.2
+    if [ ! -d go1.4.3 ]; then
+	tar zxf go1.4.3.src.tar.gz
+	mv go go1.4.3
     fi
-    if [ ! -e go1.4.2/bin/go ]; then
-	(cd go1.4.2/src/; ./make.bash)
+    if [ ! -e go1.4.3/bin/go ]; then
+	(cd go1.4.3/src/; ./make.bash)
     fi
 fi
-export GOROOT_BOOTSTRAP=`pwd`/go1.4.2
+export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
 # install Go
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go${GOVER}.src.tar.gz ]; then
