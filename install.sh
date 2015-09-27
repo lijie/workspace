@@ -1,12 +1,15 @@
 #!/bin/sh
 
+#
+# Debian:
+# Need install sudo first
+#
+
 # install develop tools in debian/ubuntu
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget"
-TOOLS_LINUX_ONLY="cgvg sudo systemtap"
-TOOLS_TENCENT="git-svn subversion"
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget cgvg systemtap subversion git-svn"
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
-    sudo apt-get install -y $TOOLS $TOOLS_LINUX_ONLY $TOOLS_TENCENT
+    sudo apt-get install -y $TOOLS
 fi
 
 DARWIN=`uname -a | grep -i darwin`
@@ -96,7 +99,9 @@ if [ -e src/$ORACLE ]; then
 else
     $GO get $ORACLE
 fi
-       
+
+sudo cp deps/bin/godef /usr/local/bin
+sudo cp deps/bin/oracle /usr/local/bin
+
 # and last
-echo "step1: Put $GOBINPATH to you PATH"
-echo "step2: Copy deps/bin/godef, deps/bin/oracle to you Path"
+echo "Put $GOBINPATH to you PATH"
