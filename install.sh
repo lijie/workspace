@@ -143,8 +143,10 @@ fi
 cp golden-ratio.el/golden-ratio.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
+rm cpplint.py
 wget http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
 cp cpplint.py $LIJIEPATH
+rm google-c-style.el
 wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
 cp google-c-style.el $LIJIEPATH
 
