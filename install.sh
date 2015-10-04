@@ -27,7 +27,6 @@ cp markdown-mode.el ~/
 # install deps
 mkdir -p deps
 
-# install go mode for emacs
 cd deps
 
 GOVER=1.5.1
@@ -76,6 +75,7 @@ export PATH=$GOBINPATH:$PATH
 
 export GOPATH=`pwd`
 
+# install go mode for emacs
 if [ -e go-mode.el ]; then
     (cd go-mode.el; git pull)
 else
@@ -100,8 +100,42 @@ else
     $GO get $ORACLE
 fi
 
-sudo cp deps/bin/godef /usr/local/bin
-sudo cp deps/bin/oracle /usr/local/bin
+sudo cp bin/godef /usr/local/bin
+sudo cp bin/oracle /usr/local/bin
+
+# install helm
+if [ -e helm ]; then
+    (cd helm; git pull)
+else
+    git clone https://github.com/emacs-helm/helm.git helm
+fi
+if [ -e async ]; then
+    (cd async; git pull)
+else
+    git clone https://github.com/jwiegley/emacs-async.git async
+fi
+(cd helm; make)
+
+HELMDIR=`pwd`/helm
+ASYNCDIR=`pwd`/async
+sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
+sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
+
+# install helm-gtags
+if [ -e emacs-helm-gtags ]; then
+    (cd emacs-helm-gtags; git pull)
+else
+    git clone https://github.com/syohex/emacs-helm-gtags
+fi
+cp emacs-helm-gtags/helm-gtags.el ~/helm-gtags.el
+
+# install golden-ratio
+if [ -e golden-ratio.el ]; then
+    (cd golden-ratio.el; git pull)
+else
+    git clone https://github.com/roman/golden-ratio.el
+fi
+cp golden-ratio.el/golden-ratio.el ~/
 
 # and last
 echo "Put $GOBINPATH to you PATH"

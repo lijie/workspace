@@ -48,10 +48,11 @@
 (setq make-backup-files nil)
 
 (add-hook 'c-mode-hook '(lambda ()(c-set-style "linux")))
-;(add-hook 'c++-mode-hook '(lambda()(c-set-style "linux")))
 (add-hook 'c++-mode-hook 'google-set-c-style)
-(add-hook 'c++-mode-hook '(lambda () (gtags-mode 1)))
-(add-hook 'c-mode-hook '(lambda () (gtags-mode 1)))
+
+;; 不再使用gtags-mode, 改用更为方便的helm-gtags-mode
+;(add-hook 'c++-mode-hook '(lambda () (gtags-mode 1)))
+;(add-hook 'c-mode-hook '(lambda () (gtags-mode 1)))
 
 
 ;; keep silent
@@ -65,7 +66,7 @@
 (global-set-key "\C-c\C-c" 'comment-region)
 (global-set-key "\C-c\C-g" 'goto-line)
 (global-set-key "\C-x\C-b" 'bs-show)
-;(global-set-key (kbd "C-x C-b") 'ibuffer-bs-show)
+;(global-set-key (kbd "C-x C-b") 'ibuffer-list-buffers)
 (global-set-key "\M-p"  'bs-cycle-previous)
 (global-set-key "\M-n"  'bs-cycle-next)
 (global-set-key "\M-a"  'beginning-of-line-text)
@@ -74,9 +75,13 @@
 (global-set-key "\C-c\C-f"  'grep-find)
 (global-set-key "\C-c\l"  'align)
 (global-set-key "\C-c\f"  'find-file-at-point)
-(global-set-key "\C-cgs"  'gtags-find-symbol)
-(global-set-key "\C-cgr"  'gtags-find-rtag)
-(global-set-key "\C-cgf"  'gtags-find-file)
+
+;; 不再使用gtags.el, 改用helm-gtags.el
+;(global-set-key "\C-cgs"  'gtags-find-symbol)
+;(global-set-key "\C-cgr"  'gtags-find-rtag)
+;(global-set-key "\C-cgf"  'gtags-find-file)
+;(global-set-key "\C-cgt"  'gtags-find-tag)
+
 (setq-default kill-whole-line t)
 (setq align-to-tab-stop nil)
 
@@ -89,11 +94,6 @@
 ;; Turn on font-lock in all modes that support it
 (global-font-lock-mode t)))
 
-;; (require 'php-mode)
-;(require 'xcscope)
-;(load "~/xcscope.el")
-;(load "~/gtags.el")
-;(require 'history)
 (load "~/google-c-style.el")
 (load "~/markdown-mode.el")
 
@@ -118,8 +118,6 @@
 
 ;Set Default-mode
 (setq default-major-mode 'text-mode) 
-
-;tab��indent
 
 (setq default-tab-width 8)
 
@@ -349,3 +347,45 @@ occurence of CHAR."
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+;; helm
+(add-to-list 'load-path "replace_path_to_helm")
+(add-to-list 'load-path "replace_path_to_async")
+(require 'helm-config)
+
+;; helm-gtags
+(load "~/helm-gtags.el")
+(add-hook 'c++-mode-hook '(lambda () (helm-gtags-mode 1)))
+(add-hook 'c-mode-hook '(lambda () (helm-gtags-mode 1)))
+
+;; helm-gtags customize
+(custom-set-variables
+ '(helm-gtags-path-style 'relative)
+ '(helm-gtags-ignore-case t)
+ '(helm-gtags-auto-update t))
+
+;; key binds for helm-gtags
+(eval-after-load "helm-gtags"
+  '(progn
+     (define-key helm-gtags-mode-map (kbd "C-c g t") 'helm-gtags-find-tag-other-window)
+     (define-key helm-gtags-mode-map (kbd "C-c g r") 'helm-gtags-find-rtag)
+     (define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
+     (define-key helm-gtags-mode-map (kbd "C-c g f") 'helm-gtags-parse-file)
+     (define-key helm-gtags-mode-map (kbd "C-c g p") 'helm-gtags-previous-history)
+     (define-key helm-gtags-mode-map (kbd "C-c g n") 'helm-gtags-next-history)))
+
+;; melpa
+(require 'package)
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/"))
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(add-to-list 'package-archives
+	     '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(package-initialize)
+
+
+;; golden-ratio
+(require 'golden-ratio)
+(golden-ratio-mode 1)
