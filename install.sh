@@ -5,8 +5,12 @@
 # Need install sudo first
 #
 
+# 用来存放七七八八的各种配置文件
+LIJIEPATH=~/.lijie
+mkdir -p $LIJIEPATH
+
 # install develop tools in debian/ubuntu
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget cgvg systemtap subversion git-svn"
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal"
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
     sudo apt-get install -y $TOOLS
@@ -14,15 +18,16 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake global screen git subversion wget
+    sudo port install emacs make cmake global screen git subversion wget
 fi
 
 cp emacs_config ~/.emacs
 cp screenrc_config ~/.screenrc
 cp gitconfig_config ~/.gitconfig
 
-cp google-c-style.el ~/
-cp markdown-mode.el ~/
+# 下面用wget获取最新的
+# cp google-c-style.el $LIJIEPATH
+cp markdown-mode.el $LIJIEPATH
 
 # install deps
 mkdir -p deps
@@ -81,8 +86,8 @@ if [ -e go-mode.el ]; then
 else
     git clone https://github.com/dominikh/go-mode.el
 fi
-cp go-mode.el/go-mode.el ~/
-cp go-mode.el/go-mode-autoloads.el ~/
+cp go-mode.el/go-mode.el $LIJIEPATH
+cp go-mode.el/go-mode-autoloads.el $LIJIEPATH
 
 # install godef
 GODEF=github.com/rogpeppe/godef
@@ -127,7 +132,7 @@ if [ -e emacs-helm-gtags ]; then
 else
     git clone https://github.com/syohex/emacs-helm-gtags
 fi
-cp emacs-helm-gtags/helm-gtags.el ~/helm-gtags.el
+cp emacs-helm-gtags/helm-gtags.el $LIJIEPATH/helm-gtags.el
 
 # install golden-ratio
 if [ -e golden-ratio.el ]; then
@@ -135,7 +140,13 @@ if [ -e golden-ratio.el ]; then
 else
     git clone https://github.com/roman/golden-ratio.el
 fi
-cp golden-ratio.el/golden-ratio.el ~/
+cp golden-ratio.el/golden-ratio.el $LIJIEPATH/
+
+# cpplint.py for google c++ coding style
+wget http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+cp cpplint.py $LIJIEPATH
+wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
+cp google-c-style.el $LIJIEPATH
 
 # and last
 echo "Put $GOBINPATH to you PATH"

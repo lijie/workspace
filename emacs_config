@@ -3,33 +3,13 @@
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(c-basic-offset 4)
  '(c-strict-syntax-p t)
  '(c-tab-always-indent nil)
  '(column-number-mode t)
-; '(cua-mode nil)
-; '(display-battery-mode nil)
-; '(display-time-mode nil)
  '(history-file "~/emacs-history.el")
- '(pop3-leave-mail-on-server t)
- '(pop3-maildrop "lijay")
- '(pop3-mailhost "pop3.126.com")
- '(pop3-password-required t)
- '(project-file "~/emacs-projects.el")
-; '(show-paren-mode t nil (paren))
- '(standard-indent 4)
+ '(standard-indent 8)
  '(tool-bar-mode nil nil (tool-bar))
  '(transient-mark-mode t))
-;;(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
-;; '(default ((t (:stipple nil :background "black" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :family "outline-courier new"))))
-;; '(cursor ((t (:background "red")))))
-
-;(require 'ido)
-;(ido-mode t)
 
 ;; apointment enable
 (setq appt-issue-message t)
@@ -71,10 +51,17 @@
 (global-set-key "\M-n"  'bs-cycle-next)
 (global-set-key "\M-a"  'beginning-of-line-text)
 (global-set-key "\C-c\h"  'speedbar-get-focus)
-(global-set-key "\C-c\i"  'imenu)
+;(global-set-key "\C-c\i"  'imenu)
 (global-set-key "\C-c\C-f"  'grep-find)
 (global-set-key "\C-c\l"  'align)
 (global-set-key "\C-c\f"  'find-file-at-point)
+
+;; use helm-M-x as default
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-file)
+(global-set-key (kbd "M-/") 'helm-dabbrev)
+(global-set-key (kbd "C-c i") 'helm-imenu)
+
 
 ;; 不再使用gtags.el, 改用helm-gtags.el
 ;(global-set-key "\C-cgs"  'gtags-find-symbol)
@@ -94,10 +81,10 @@
 ;; Turn on font-lock in all modes that support it
 (global-font-lock-mode t)))
 
-(load "~/google-c-style.el")
-(load "~/markdown-mode.el")
-
-(add-to-list 'load-path "~/" t)
+;; set lijie path as load-path
+(add-to-list 'load-path "~/.lijie" t)
+(load "~/.lijie/google-c-style.el")
+(load "~/.lijie/markdown-mode.el")
 (require 'go-mode-autoloads)
 
 ; emacs title
@@ -282,10 +269,6 @@ occurence of CHAR."
   (kill-new (buffer-substring s (point)))))
 (global-set-key [(shift down)] 'ue-select-line-down-continued)
 
-;(setq todo-file-do "~/todo/do")
-;(setq todo-file-done "~/todo/done")
-;(setq todo-file-top "~/todo/top")
-
 (setq calendar-remove-frame-by-deleting t)
 (setq calendar-week-start-day 1)            ;
 (setq mark-diary-entries-in-calendar t)     ;
@@ -354,7 +337,7 @@ occurence of CHAR."
 (require 'helm-config)
 
 ;; helm-gtags
-(load "~/helm-gtags.el")
+(load "~/.lijie/helm-gtags.el")
 (add-hook 'c++-mode-hook '(lambda () (helm-gtags-mode 1)))
 (add-hook 'c-mode-hook '(lambda () (helm-gtags-mode 1)))
 
@@ -385,7 +368,35 @@ occurence of CHAR."
 	     '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-
 ;; golden-ratio
 (require 'golden-ratio)
 (golden-ratio-mode 1)
+
+;; google c++ style check
+(defun cpplint ()
+  "check source code format according to Google Style Guide"
+  (interactive)
+  (compilation-start (concat "python ~/.lijie/cpplint.py " (buffer-file-name))))
+
+;; enable helm-mode
+;; helm 看起来很不错, 强化了很多emacs原来的功能
+(helm-mode 1)
+
+;; helm features:
+
+;; helm-mode: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.
+;; helm-find-files: Replace in one command all the files related commands (Bind it to C-x C-f!).
+;; helm-buffers-list: Enhanced buffers listing.
+;; helm-browse-project: Show all buffers and files related to project or current directory (Usable everywhere with helm-find-files) you will want to install helm-ls-git, helm-ls-hg and helm-ls-svn for a better experience.
+;; helm-dabbrev: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
+;; helm-moccur: Enhanced occur for one or more buffers, launch it from helm-buffers-list or current-buffer(Own implementation).
+;; helm-M-x: Enhanced version of execute-extended-command (Bind it to M-x!).
+;; helm-imenu and helm-imenu-in-all-buffers: Imenu in current-buffer or in all your buffers.
+;; helm-etags-select: Enhanced version of etags with helm-completion (Usable everywhere with helm-find-files).
+;; helm-apropos: Description of functions, variables, etc... Use it instead of Most C-h commands.
+;; Grep: You can launch it (recursively or not) from any files related helm commands, support as backends grep, ack-grep, git-grep, ag and pt (Own implementation).
+;; helm-gid: Helm interface to gid from id-utils.
+;; helm-show-kill-ring: A kill ring browser for helm.
+;; helm-all-mark-rings: A mark ring for helm, allow retrieving your last position(s) in a buffer.
+;; helm-filtered-bookmarks: An enhanced bookmark listing.
+;; helm-list-elisp-packages: Manage emacs packages with helm.
