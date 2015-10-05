@@ -18,7 +18,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs make cmake global screen git subversion wget
+    sudo port install emacs cmake global screen git subversion wget
 fi
 
 cp emacs_config ~/.emacs
@@ -123,8 +123,8 @@ fi
 
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
-sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
-sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
+sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
 
 # install helm-gtags
 if [ -e emacs-helm-gtags ]; then
@@ -143,11 +143,13 @@ fi
 cp golden-ratio.el/golden-ratio.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
-rm cpplint.py
-wget http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+if [ ! -e cpplint.py ]; then
+    wget http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+fi
 cp cpplint.py $LIJIEPATH
-rm google-c-style.el
-wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
+if [ ! -e google-c-style.el ]; then
+    wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
+fi
 cp google-c-style.el $LIJIEPATH
 
 # and last
