@@ -5,12 +5,40 @@
 # Need install sudo first
 #
 
+# $1 git url
+# $2 loacl path
+gitget()
+{
+    echo "git clone or update:", $1
+    if [ -e $2 ]; then
+	(cd $2; git pull)
+    else
+	git clone $1
+    fi
+}
+
 # 用来存放七七八八的各种配置文件
 LIJIEPATH=~/.lijie
 mkdir -p $LIJIEPATH
 
+LINUX=1
+
 # install develop tools in debian/ubuntu
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal"
+
+# subversion
+# 腾讯内部需要使用svn,其它场合只使用git
+
+# python
+# google cpplin.py 需要python
+
+# ack-grep & silversearcher-ag
+# grep的替代工具, 用于代码搜索, ag是ack的加速版本, 实测速度确实更快
+# 另外还有 the_platinum_seacher, 这是ag的golang版本
+# 除了提供跟ag相似的性能以外, 因为有go的跨平台优势, 在windows上效果会更好.
+# the_platinum_seacher 地址:
+# https://github.com/monochromegane/the_platinum_searcher
+
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag"
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
     sudo apt-get install -y $TOOLS
@@ -18,7 +46,8 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake global screen git subversion wget
+    sudo port install emacs cmake global screen git subversion wget the_silver_searcher
+    unset LINUX
 fi
 
 cp emacs_config ~/.emacs
@@ -81,11 +110,7 @@ export PATH=$GOBINPATH:$PATH
 export GOPATH=`pwd`
 
 # install go mode for emacs
-if [ -e go-mode.el ]; then
-    (cd go-mode.el; git pull)
-else
-    git clone https://github.com/dominikh/go-mode.el
-fi
+gitget https://github.com/dominikh/go-mode.el go-mode.el
 cp go-mode.el/go-mode.el $LIJIEPATH
 cp go-mode.el/go-mode-autoloads.el $LIJIEPATH
 
@@ -109,38 +134,35 @@ sudo cp bin/godef /usr/local/bin
 sudo cp bin/oracle /usr/local/bin
 
 # install helm
-if [ -e helm ]; then
-    (cd helm; git pull)
-else
-    git clone https://github.com/emacs-helm/helm.git helm
-fi
-if [ -e async ]; then
-    (cd async; git pull)
-else
-    git clone https://github.com/jwiegley/emacs-async.git async
-fi
+gitget "https://github.com/emacs-helm/helm.git helm" helm
+gitget "https://github.com/jwiegley/emacs-async.git async" async
 (cd helm; make)
 
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
-sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
-sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+if [ -n "$DARWIN" ]; then
+    sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+    sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+else
+    sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
+    sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
+fi
+
+# for emacs
+# 插件加载的太多会拖慢emacs的启动速度
+# 不过还好电脑速度越来越快...
 
 # install helm-gtags
-if [ -e emacs-helm-gtags ]; then
-    (cd emacs-helm-gtags; git pull)
-else
-    git clone https://github.com/syohex/emacs-helm-gtags
-fi
+gitget https://github.com/syohex/emacs-helm-gtags emacs-helm-gtags
 cp emacs-helm-gtags/helm-gtags.el $LIJIEPATH/helm-gtags.el
 
 # install golden-ratio
-if [ -e golden-ratio.el ]; then
-    (cd golden-ratio.el; git pull)
-else
-    git clone https://github.com/roman/golden-ratio.el
-fi
+gitget https://github.com/roman/golden-ratio.el golden-ratio.el
 cp golden-ratio.el/golden-ratio.el $LIJIEPATH/
+
+# elisp warpper for ag
+gitget https://github.com/syohex/emacs-helm-ag emacs-helm-ag
+cp emacs-helm-ag/helm-ag.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
 if [ ! -e cpplint.py ]; then
@@ -151,6 +173,11 @@ if [ ! -e google-c-style.el ]; then
     wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
 fi
 cp google-c-style.el $LIJIEPATH
+
+# install linux perf tools
+if [ -n "$LINUX" ]; then
+    gitget https://github.com/brendangregg/perf-tools perf-tools
+fi
 
 # and last
 echo "Put $GOBINPATH to you PATH"

@@ -357,6 +357,9 @@ occurence of CHAR."
      (define-key helm-gtags-mode-map (kbd "C-c g p") 'helm-gtags-previous-history)
      (define-key helm-gtags-mode-map (kbd "C-c g n") 'helm-gtags-next-history)))
 
+;; helm-ag
+(load "~/.lijie/helm-ag.el")
+
 ;; melpa
 (require 'package)
 (add-to-list 'package-archives
