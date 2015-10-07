@@ -21,6 +21,11 @@ gitget()
 LIJIEPATH=~/.lijie
 mkdir -p $LIJIEPATH
 
+PREFIX=~/opt
+mkdir -p $PREFIX/bin
+
+PWD=`pwd`
+
 LINUX=1
 
 # install develop tools in debian/ubuntu
@@ -57,6 +62,11 @@ cp gitconfig_config ~/.gitconfig
 # 下面用wget获取最新的
 # cp google-c-style.el $LIJIEPATH
 cp markdown-mode.el $LIJIEPATH
+
+SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
+if [ -z "$SETBASHRC" ]; then
+    echo "source" $PWD/my_bashrc.sh >> ~/.bashrc
+fi
 
 # install deps
 mkdir -p deps
@@ -130,8 +140,8 @@ else
     $GO get $ORACLE
 fi
 
-sudo cp bin/godef /usr/local/bin
-sudo cp bin/oracle /usr/local/bin
+cp bin/godef $PREFIX/bin
+cp bin/oracle $PREFIX/bin
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
@@ -178,6 +188,3 @@ cp google-c-style.el $LIJIEPATH
 if [ -n "$LINUX" ]; then
     gitget https://github.com/brendangregg/perf-tools perf-tools
 fi
-
-# and last
-echo "Put $GOBINPATH to you PATH"
