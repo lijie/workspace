@@ -65,7 +65,7 @@ cp markdown-mode.el $LIJIEPATH
 
 SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
 if [ -z "$SETBASHRC" ]; then
-    echo "source" $PWD/my_bashrc.sh >> ~/.bashrc
+    echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
 fi
 
 # install deps

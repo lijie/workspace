@@ -8,7 +8,7 @@ alias ag='ag -i'
 alias ack='ack -i'
 alias a='ag -i'
 
-GOBINPATH=`dirname $0`/deps/go/bin
+GOBINPATH=$1/deps/go/bin
 
 export PATH=~/opt/bin:$GOBINPATH:$PATH
 
