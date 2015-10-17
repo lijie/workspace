@@ -43,7 +43,8 @@ LINUX=1
 # the_platinum_seacher 地址:
 # https://github.com/monochromegane/the_platinum_searcher
 
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag"
+TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev bear"
+
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
     sudo apt-get install -y $TOOLS
@@ -173,6 +174,21 @@ cp golden-ratio.el/golden-ratio.el $LIJIEPATH/
 # elisp warpper for ag
 gitget https://github.com/syohex/emacs-helm-ag emacs-helm-ag
 cp emacs-helm-ag/helm-ag.el $LIJIEPATH/
+
+# company-mode
+gitget https://github.com/company-mode/company-mode company-mode
+cp company-mode/company*.el $LIJIEPATH/
+
+# irony-mode
+gitget https://github.com/Sarcasm/irony-mode irony-mode
+cp irony-mode/irony*.el $LIJIEPATH/
+
+# install irony-mode server
+cmake -DCMAKE_INSTALL_PREFIX=~/.emacs.d/irony/ irony-mode/server && cmake --build . --use-stderr --config Release --target install
+
+# company-irony
+gitget https://github.com/Sarcasm/company-irony company-irony
+cp company-irony/*.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
 if [ ! -e cpplint.py ]; then
