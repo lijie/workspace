@@ -403,3 +403,39 @@ occurence of CHAR."
 ;; helm-all-mark-rings: A mark ring for helm, allow retrieving your last position(s) in a buffer.
 ;; helm-filtered-bookmarks: An enhanced bookmark listing.
 ;; helm-list-elisp-packages: Manage emacs packages with helm.
+
+;; 加载company-mode
+(load "~/.lijie/company.el")
+
+;; 修改company-tooltips的前景色, 默认是黑色, 跟控制台背景重叠了
+(custom-set-faces
+ '(company-tooltip ((t (:foreground "white")))))
+
+;; 在c/c++/objc下打开company-mode
+(add-hook 'c++-mode-hook 'company-mode)
+(add-hook 'c-mode-hook 'company-mode)
+(add-hook 'objc-mode-hook 'company-mode)
+	  
+;; 加载irony-mode
+(load "~/.lijie/irony.el")
+(load "~/.lijie/irony-cdb.el")
+
+;; 在c/c++/objc下打开irony-mode
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'objc-mode-hook 'irony-mode)
+
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+;; 将irony作为company的后端
+(load "~/.lijie/company-irony.el")
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
