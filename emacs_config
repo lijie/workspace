@@ -50,7 +50,8 @@
 (global-set-key "\M-p"  'bs-cycle-previous)
 (global-set-key "\M-n"  'bs-cycle-next)
 (global-set-key "\M-a"  'beginning-of-line-text)
-(global-set-key "\C-c\h"  'speedbar-get-focus)
+; 不再使用speedbar, 似乎没啥用处...
+;(global-set-key "\C-c\h"  'speedbar-get-focus)
 ;(global-set-key "\C-c\i"  'imenu)
 (global-set-key "\C-c\C-f"  'grep-find)
 (global-set-key "\C-c\l"  'align)
