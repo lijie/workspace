@@ -409,12 +409,29 @@ occurence of CHAR."
 
 ;; 修改company-tooltips的前景色, 默认是黑色, 跟控制台背景重叠了
 (custom-set-faces
- '(company-tooltip ((t (:foreground "white")))))
+ '(company-preview
+   ((t (:foreground "darkgray" :underline t))))
+ '(company-preview-common
+   ((t (:inherit company-preview))))
+ '(company-tooltip
+   ((t (:background "lightgray" :foreground "black"))))
+ '(company-tooltip-selection
+   ((t (:background "steelblue" :foreground "white"))))
+ '(company-tooltip-common
+   ((((type x)) (:inherit company-tooltip :weight bold))
+    (t (:inherit company-tooltip))))
+ '(company-tooltip-common-selection
+   ((((type x)) (:inherit company-tooltip-selection :weight bold))
+    (t (:inherit company-tooltip-selection)))))
+
+;(custom-set-faces
+; '(company-tooltip ((t (:foreground "white")))))
 
 ;; 在c/c++/objc下打开company-mode
 (add-hook 'c++-mode-hook 'company-mode)
 (add-hook 'c-mode-hook 'company-mode)
 (add-hook 'objc-mode-hook 'company-mode)
+(add-hook 'go-mode-hook 'company-mode)
 	  
 ;; 加载irony-mode
 (load "~/.lijie/irony.el")
@@ -439,3 +456,10 @@ occurence of CHAR."
 (load "~/.lijie/company-irony.el")
 (eval-after-load 'company
   '(add-to-list 'company-backends 'company-irony))
+
+;; load company-go
+(load "~/.lijie/company-go")
+
+;; 将gocode作为company的后端
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-go))

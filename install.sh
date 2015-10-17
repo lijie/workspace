@@ -17,6 +17,16 @@ gitget()
     fi
 }
 
+# $1 url
+goget()
+{
+    if [ -e src/$1 ]; then
+	$GO get -u $1
+    else
+	$GO get $1
+    fi
+}
+
 # 用来存放七七八八的各种配置文件
 LIJIEPATH=~/.lijie
 mkdir -p $LIJIEPATH
@@ -126,23 +136,17 @@ cp go-mode.el/go-mode.el $LIJIEPATH
 cp go-mode.el/go-mode-autoloads.el $LIJIEPATH
 
 # install godef
-GODEF=github.com/rogpeppe/godef
-if [ -e src/$GODEF ]; then
-    $GO get -u $GODEF
-else
-    $GO get $GODEF
-fi
+goget github.com/rogpeppe/godef
 
 # install oracle tools
-ORACLE=golang.org/x/tools/cmd/oracle
-if [ -e src/$ORACLE ]; then
-    $GO get -u $ORACLE
-else
-    $GO get $ORACLE
-fi
+goget golang.org/x/tools/cmd/oracle
+
+goget github.com/nsf/gocode
+cp src/github.com/nsf/gocode/emacs-company/*.el $LIJIEPATH
 
 cp bin/godef $PREFIX/bin
 cp bin/oracle $PREFIX/bin
+cp bin/gocode $PREFIX/bin
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
