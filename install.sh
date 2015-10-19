@@ -18,6 +18,16 @@ gitget()
 }
 
 # $1 url
+# $2 local path
+wgetit()
+{
+    echo "wget:" $1
+    if [ ! -e $2 ]; then
+	wget $1
+    fi
+}
+
+# $1 url
 goget()
 {
     if [ -e src/$1 ]; then
@@ -28,10 +38,10 @@ goget()
 }
 
 # 用来存放七七八八的各种配置文件
-LIJIEPATH=~/.lijie
+LIJIEPATH=${HOME}/.lijie
 mkdir -p $LIJIEPATH
 
-PREFIX=~/opt
+PREFIX=${HOME}/opt
 mkdir -p $PREFIX/bin
 
 PWD=`pwd`
@@ -53,7 +63,8 @@ LINUX=1
 # the_platinum_seacher 地址:
 # https://github.com/monochromegane/the_platinum_searcher
 
-TOOLS="emacs-nox gcc g++ gdb make cmake global screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev bear"
+# irony-mode 似乎不支持libclang3.6, 所以3.5还是必须安装的
+TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev"
 
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
@@ -62,7 +73,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake global screen git subversion wget the_silver_searcher
+    sudo port install emacs cmake screen git subversion wget the_silver_searcher
     unset LINUX
 fi
 
@@ -208,3 +219,12 @@ cp google-c-style.el $LIJIEPATH
 if [ -n "$LINUX" ]; then
     gitget https://github.com/brendangregg/perf-tools perf-tools
 fi
+
+# debian默认的global版本实在太老了
+# 自己编译一个较新的
+wgetit http://tamacom.com/global/global-6.5.1.tar.gz global-6.5.1.tar.gz
+if [ ! -e global-6.5.1 ]; then
+    tar zxf global-6.5.1.tar.gz
+fi
+
+(cd global-6.5.1; ./configure --prefix=$PREFIX; make; make install)
