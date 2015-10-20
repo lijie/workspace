@@ -10,5 +10,13 @@ alias a='ag -i'
 
 GOBINPATH=$1/deps/go/bin
 
-export PATH=~/opt/bin:$GOBINPATH:$PATH
+TMP=`echo $PATH | grep ${HOME}/opt/bin`
+if [ -z "$TMP" ]; then
+    export PATH=${HOME}/opt/bin:$PATH
+fi
+
+TMP=`echo $PATH | grep $GOBINPATH`
+if [ -z "$TMP" ]; then
+    export PATH=$GOBINPATH:$PATH
+fi
 
