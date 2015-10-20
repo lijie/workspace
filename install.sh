@@ -228,3 +228,6 @@ if [ ! -e global-6.5.1 ]; then
 fi
 
 (cd global-6.5.1; ./configure --prefix=$PREFIX; make; make install)
+
+# rust-lang
+# wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
