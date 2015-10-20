@@ -1,4 +1,4 @@
 escape ^l^l
 caption always "%?%F%{+b 50}%:%{+b rr}%?%H | %D %m/%d %c | %?%F%{+b 50}%?%L=%-Lw%45>%{+b 30}%n%f* %t%{-}%+Lw%-0<"
 encoding UTF-8 UTF-8
-
+vbell off
