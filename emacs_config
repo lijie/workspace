@@ -358,7 +358,7 @@ occurence of CHAR."
      (define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
      (define-key helm-gtags-mode-map (kbd "C-c g f") 'helm-gtags-parse-file)
      (define-key helm-gtags-mode-map (kbd "C-c g p") 'helm-gtags-previous-history)
-     (define-key helm-gtags-mode-map (kbd "C-c g n") 'helm-gtags-next-history))
+     (define-key helm-gtags-mode-map (kbd "C-c g n") 'helm-gtags-next-history)
      (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-find-pattern)))
 
 ;; helm-ag

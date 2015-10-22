@@ -73,7 +73,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake screen git subversion wget the_silver_searcher
+    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear
     unset LINUX
 fi
 
