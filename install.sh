@@ -207,11 +207,11 @@ cp company-irony/*.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
 if [ ! -e cpplint.py ]; then
-    wget http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+    wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
 fi
 cp cpplint.py $LIJIEPATH
 if [ ! -e google-c-style.el ]; then
-    wget http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el
+    wget https://raw.githubusercontent.com/google/styleguide/gh-pages/google-c-style.el
 fi
 cp google-c-style.el $LIJIEPATH
 
