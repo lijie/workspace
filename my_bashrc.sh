@@ -8,6 +8,9 @@ alias ag='ag -i'
 alias ack='ack -i'
 alias a='ag -i'
 
+alias e="emacs"
+alias eq="emacs -Q"
+
 GOBINPATH=$1/deps/go/bin
 
 TMP=`echo $PATH | grep ${HOME}/opt/bin`
