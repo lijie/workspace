@@ -23,7 +23,7 @@ wgetit()
 {
     echo "wget:" $1
     if [ ! -e $2 ]; then
-	wget $1
+	wget --timeout=5 $1
     fi
 }
 
@@ -207,11 +207,11 @@ cp company-irony/*.el $LIJIEPATH/
 
 # cpplint.py for google c++ coding style
 if [ ! -e cpplint.py ]; then
-    wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
+    wget --timeout=5 https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
 fi
 cp cpplint.py $LIJIEPATH
 if [ ! -e google-c-style.el ]; then
-    wget https://raw.githubusercontent.com/google/styleguide/gh-pages/google-c-style.el
+    wget --timeout=5 https://raw.githubusercontent.com/google/styleguide/gh-pages/google-c-style.el
 fi
 cp google-c-style.el $LIJIEPATH
 

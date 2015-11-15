@@ -1,3 +1,6 @@
+;; 绕过emacs24.5的tramp导致启动速度非常缓慢的bug
+(setq tramp-ssh-controlmaster-options "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
@@ -86,7 +89,8 @@
 
 ;; set lijie path as load-path
 (add-to-list 'load-path "~/.lijie" t)
-(load "~/.lijie/google-c-style.el")
+(if (file-exists-p "~/.lijie/google-c-style.el")
+    (load "~/.lijie/google-c-style.el"))
 (load "~/.lijie/markdown-mode.el")
 (require 'go-mode-autoloads)
 
