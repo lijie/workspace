@@ -69,33 +69,41 @@ TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
     sudo apt-get install -y $TOOLS
+    cp screenrc_config ~/.screenrc
+
+    SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
+    if [ -z "$SETBASHRC" ]; then
+	echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
+    fi
 fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache
+    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache coreutils bash
     unset LINUX
+    cp screenrc_osx_config ~/.screenrc
+
+    sed -i '' '/my_bashrc/d' ~/.bashrc
+    SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
+    if [ -z "$SETBASHRC" ]; then
+	echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
+    fi
 fi
 
 cp emacs_config ~/.emacs
-cp screenrc_config ~/.screenrc
+
 cp gitconfig_config ~/.gitconfig
 
 # 下面用wget获取最新的
 # cp google-c-style.el $LIJIEPATH
 cp markdown-mode.el $LIJIEPATH
 
-SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
-if [ -z "$SETBASHRC" ]; then
-    echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
-fi
-
 # install deps
 mkdir -p deps
 
 cd deps
 
-GOVER=1.5.1
+GOVER=1.5.2
 
 # install Go
 GOVERSION=`go version | grep $GOVER 2>/dev/null`
@@ -222,7 +230,7 @@ fi
 
 # debian默认的global版本实在太老了
 # 自己编译一个较新的
-wgetit http://tamacom.com/global/global-6.5.1.tar.gz global-6.5.1.tar.gz
+wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.1.tar.gz global-6.5.1.tar.gz
 if [ ! -e global-6.5.1 ]; then
     tar zxf global-6.5.1.tar.gz
 fi
