@@ -14,15 +14,8 @@ fi
 gitget()
 {
     echo "git clone or update:" $1
-
-    if [ "$OFFLINE" == "1" ]; then
-	return
-    fi
-    if [ -e $2 ]; then
-	(cd $2; git pull)
-    else
-	git clone $1
-    fi
+    [ "$OFFLINE" == "1" ] && return
+    [ -e $2 ] && (cd $2; git pull) || git clone $1
 }
 
 # $1 url
@@ -30,41 +23,26 @@ gitget()
 wgetit()
 {
     echo "wget:" $1
-    if [ "$OFFLINE" == "1" ]; then
-	return
-    fi
-    if [ ! -e $2 ]; then
-	wget --timeout=5 $1
-    fi
+    [ "$OFFLINE" == "1" ] && return
+    [ ! -e $2 ] && wget --timeout=5 $1
 }
 
 # $1 url
 goget()
 {
-    if [ "$OFFLINE" == "1" ]; then
-	$GO install $1
-	return
-    fi
-    if [ -e src/$1 ]; then
-	$GO get -u $1
-    else
-	$GO get $1
-    fi
+    [ "$OFFLINE" == "1" ] && return
+    [ -e src/$1 ] && $GO get -u $1 || $GO get $1
 }
 
 aptget()
 {
-    if [ "$OFFLINE" == "1" ]; then
-	return
-    fi
+    [ "$OFFLINE" == "1" ] && return
     sudo apt-get install -y $*
 }
 
 portinstall()
 {
-    if [ "$OFFLINE" == "1" ]; then
-	return
-    fi
+    [ "$OFFLINE" == "1" ] && return
     sudo port install $*
 }
 
@@ -103,9 +81,7 @@ if [ -n "$DEBIAN" ]; then
     cp screenrc_config ~/.screenrc
 
     SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
-    if [ -z "$SETBASHRC" ]; then
-	echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
-    fi
+    [ -z "$SETBASHRC" ] && echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
 fi
 
 DARWIN=`uname -a | grep -i darwin`
@@ -116,9 +92,7 @@ if [ -n "$DARWIN" ]; then
 
     sed -i '' '/my_bashrc/d' ~/.bashrc
     SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
-    if [ -z "$SETBASHRC" ]; then
-	echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
-    fi
+    [ -z "$SETBASHRC" ] && echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
 fi
 
 cp emacs_config ~/.emacs
@@ -151,9 +125,7 @@ if [ -z "$GOVERSION" ]; then
 	tar zxf go1.4.3.src.tar.gz
 	mv go go1.4.3
     fi
-    if [ ! -e go1.4.3/bin/go ]; then
-	(cd go1.4.3/src/; ./make.bash)
-    fi
+    [ ! -e go1.4.3/bin/go ] && (cd go1.4.3/src/; ./make.bash)
 fi
 export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
 # install Go
@@ -170,9 +142,7 @@ if [ -z "$GOVERSION" ]; then
 	mv go go${GOVER}
     fi
     ln -sf go${GOVER} go
-    if [ ! -e go${GOVER}/bin/go ]; then
-	(cd go${GOVER}/src/; ./make.bash)
-    fi
+    [ ! -e go${GOVER}/bin/go ] && (cd go${GOVER}/src/; ./make.bash)
 fi
 GOBINPATH=`pwd`/go/bin
 export GO=${GOBINPATH}/go
@@ -255,16 +225,12 @@ fi
 cp google-c-style.el $LIJIEPATH
 
 # install linux perf tools
-if [ -n "$LINUX" ]; then
-    gitget https://github.com/brendangregg/perf-tools perf-tools
-fi
+[ -n "$LINUX" ] && gitget https://github.com/brendangregg/perf-tools perf-tools
 
 # debian默认的global版本实在太老了
 # 自己编译一个较新的
 wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.1.tar.gz global-6.5.1.tar.gz
-if [ ! -e global-6.5.1 ]; then
-    tar zxf global-6.5.1.tar.gz
-fi
+[ ! -e global-6.5.1 ] && tar zxf global-6.5.1.tar.gz
 
 (cd global-6.5.1; ./configure --prefix=$PREFIX; make; make install)
 
