@@ -1,15 +1,23 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 # Debian:
 # Need install sudo first
 #
 
+if [ "$1" == "offline" ]; then
+    OFFLINE=1
+fi
+
 # $1 git url
 # $2 loacl path
 gitget()
 {
-    echo "git clone or update:", $1
+    echo "git clone or update:" $1
+
+    if [ "$OFFLINE" == "1" ]; then
+	return
+    fi
     if [ -e $2 ]; then
 	(cd $2; git pull)
     else
@@ -22,6 +30,9 @@ gitget()
 wgetit()
 {
     echo "wget:" $1
+    if [ "$OFFLINE" == "1" ]; then
+	return
+    fi
     if [ ! -e $2 ]; then
 	wget --timeout=5 $1
     fi
@@ -30,11 +41,31 @@ wgetit()
 # $1 url
 goget()
 {
+    if [ "$OFFLINE" == "1" ]; then
+	$GO install $1
+	return
+    fi
     if [ -e src/$1 ]; then
 	$GO get -u $1
     else
 	$GO get $1
     fi
+}
+
+aptget()
+{
+    if [ "$OFFLINE" == "1" ]; then
+	return
+    fi
+    sudo apt-get install -y $*
+}
+
+portinstall()
+{
+    if [ "$OFFLINE" == "1" ]; then
+	return
+    fi
+    sudo port install $*
 }
 
 # 用来存放七七八八的各种配置文件
@@ -68,7 +99,7 @@ TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git
 
 DEBIAN=`uname -a | grep -i debian`
 if [ -n "$DEBIAN" ]; then
-    sudo apt-get install -y $TOOLS
+    aptget $TOOLS
     cp screenrc_config ~/.screenrc
 
     SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
@@ -110,7 +141,7 @@ GOVERSION=`go version | grep $GOVER 2>/dev/null`
 # install Go1.4.3
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go1.4.3.src.tar.gz ]; then
-	wget https://storage.googleapis.com/golang/go1.4.3.src.tar.gz
+	wgetit https://storage.googleapis.com/golang/go1.4.3.src.tar.gz go1.4.3.src.tar.gz
     fi
     if [ ! -e go1.4.3.src.tar.gz ]; then
 	echo "download go1.4.3.src.tar.gz failed"
@@ -128,7 +159,7 @@ export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
 # install Go
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go${GOVER}.src.tar.gz ]; then
-	wget https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz
+	wgetit https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz go${GOVER}.src.tar.gz
     fi
     if [ ! -e go${GOVER}.src.tar.gz ]; then
 	echo "download go${GOVER}.src.tar.gz failed"
