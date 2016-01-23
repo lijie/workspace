@@ -67,6 +67,8 @@
 (global-set-key (kbd "C-c i") 'helm-imenu)
 (global-set-key (kbd "C-c s") 'helm-ag)
 (global-set-key (kbd "C-c c") 'company-complete)
+;; 用swoop替代search-forward
+(global-set-key (kbd "\C-s") 'helm-swoop)
 
 
 ;; 不再使用gtags.el, 改用helm-gtags.el
@@ -367,6 +369,9 @@ occurence of CHAR."
 
 ;; helm-ag
 (load "~/.lijie/helm-ag.el")
+
+;; helm-swoop
+(load "~/.lijie/helm-swoop.el")
 
 ;; melpa
 (require 'package)

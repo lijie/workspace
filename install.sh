@@ -108,7 +108,7 @@ mkdir -p deps
 
 cd deps
 
-GOVER=1.6beta1
+GOVER=1.6beta2
 
 # install Go
 GOVERSION=`go version | grep $GOVER 2>/dev/null`
@@ -213,6 +213,19 @@ cmake -DCMAKE_INSTALL_PREFIX=~/.emacs.d/irony/ irony-mode/server && cmake --buil
 # company-irony
 gitget https://github.com/Sarcasm/company-irony company-irony
 cp company-irony/*.el $LIJIEPATH/
+
+# swiper
+gitget https://github.com/abo-abo/swiper swiper
+
+# helm-swoop
+# 它的功能跟swiper应该是重合的, 二者选其一就好
+# 如果整合helm, 那就用这个吧
+gitget https://github.com/ShingoFukuyama/helm-swoop helm-swoop
+cp helm-swoop/helm-swoop.el $LIJIEPATH/
+
+# multiple-cursors
+# 不知道是干啥用的....
+gitget https://github.com/magnars/multiple-cursors.el multiple-cursors.el
 
 # cpplint.py for google c++ coding style
 if [ ! -e cpplint.py ]; then
