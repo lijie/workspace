@@ -108,10 +108,10 @@ mkdir -p deps
 
 cd deps
 
-GOVER=1.6beta2
+GOVER=1.6
 
 # install Go
-GOVERSION=`go version | grep $GOVER 2>/dev/null`
+GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
 # install Go1.4.3
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go1.4.3.src.tar.gz ]; then
