@@ -15,3 +15,5 @@
 	who = shortlog -s --
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all --color
 
+[push]
+	default = simple
