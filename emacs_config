@@ -68,8 +68,8 @@
 (global-set-key (kbd "C-c s") 'helm-ag)
 (global-set-key (kbd "C-c c") 'company-complete)
 ;; 用swoop替代search-forward
-(global-set-key (kbd "\C-s") 'helm-swoop)
-
+(global-set-key (kbd "\C-s") 'isearch-forward)
+(global-set-key (kbd "M-s s") 'helm-swoop)
 
 ;; 不再使用gtags.el, 改用helm-gtags.el
 ;(global-set-key "\C-cgs"  'gtags-find-symbol)
