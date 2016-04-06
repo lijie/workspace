@@ -113,6 +113,7 @@ GOVER=1.6
 # install Go
 GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
 # install Go1.4.3
+export CGO_ENABLED=0
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go1.4.3.src.tar.gz ]; then
 	wgetit https://storage.googleapis.com/golang/go1.4.3.src.tar.gz go1.4.3.src.tar.gz
@@ -128,6 +129,7 @@ if [ -z "$GOVERSION" ]; then
     [ ! -e go1.4.3/bin/go ] && (cd go1.4.3/src/; ./make.bash)
 fi
 export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
+unset CGO_ENABLED
 # install Go
 if [ -z "$GOVERSION" ]; then
     if [ ! -e go${GOVER}.src.tar.gz ]; then
@@ -242,10 +244,10 @@ cp google-c-style.el $LIJIEPATH
 
 # debian默认的global版本实在太老了
 # 自己编译一个较新的
-wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.1.tar.gz global-6.5.1.tar.gz
-[ ! -e global-6.5.1 ] && tar zxf global-6.5.1.tar.gz
+wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.3.tar.gz global-6.5.3.tar.gz
+[ ! -e global-6.5.3 ] && tar zxf global-6.5.3.tar.gz
 
-(cd global-6.5.1; ./configure --prefix=$PREFIX; make; make install)
+(cd global-6.5.3; ./configure --prefix=$PREFIX; make; make install)
 
 # rust-lang
 # wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
