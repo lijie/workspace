@@ -215,7 +215,7 @@ gitget https://github.com/Sarcasm/company-irony company-irony
 cp company-irony/*.el $LIJIEPATH/
 
 # swiper
-gitget https://github.com/abo-abo/swiper swiper
+# gitget https://github.com/abo-abo/swiper swiper
 
 # helm-swoop
 # 它的功能跟swiper应该是重合的, 二者选其一就好
