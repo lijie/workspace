@@ -108,7 +108,7 @@ mkdir -p deps
 
 cd deps
 
-GOVER=1.6.2
+GOVER=1.7
 
 # install Go
 GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
