@@ -73,9 +73,9 @@ LINUX=1
 # https://github.com/monochromegane/the_platinum_searcher
 
 # irony-mode 似乎不支持libclang3.6, 所以3.5还是必须安装的
-TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache"
+TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache libncurses5-dev"
 
-DEBIAN=`uname -a | grep -i debian`
+DEBIAN=`uname -a | grep -i "debian\|ubuntu"`
 if [ -n "$DEBIAN" ]; then
     aptget $TOOLS
     cp screenrc_config ~/.screenrc
