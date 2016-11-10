@@ -69,6 +69,8 @@
 (global-set-key (kbd "C-c c") 'company-complete)
 (global-set-key (kbd "M-s s") 'helm-swoop)
 (global-set-key (kbd "C-s") 'isearch-forward)
+(global-set-key (kbd "C-c p") 'find-file-in-project)
+(global-set-key (kbd "C-c r") 'ffip-ivy-resume)
 
 ;; 不再使用gtags.el, 改用helm-gtags.el
 ;(global-set-key "\C-cgs"  'gtags-find-symbol)
@@ -358,6 +360,7 @@ occurence of CHAR."
 ;; key binds for helm-gtags
 (eval-after-load "helm-gtags"
   '(progn
+     (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-find-tag-other-window)
      (define-key helm-gtags-mode-map (kbd "C-c g t") 'helm-gtags-find-tag-other-window)
      (define-key helm-gtags-mode-map (kbd "C-c g r") 'helm-gtags-find-rtag)
      (define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
