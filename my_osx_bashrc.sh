@@ -11,6 +11,7 @@ alias a='ag -i'
 
 alias e="emacs"
 alias eq="emacs -Q"
+alias ex="open /Applications/Emacs.app"
 
 GOBINPATH=$1/deps/go/bin
 

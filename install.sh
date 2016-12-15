@@ -73,7 +73,7 @@ LINUX=1
 # https://github.com/monochromegane/the_platinum_searcher
 
 # irony-mode 似乎不支持libclang3.6, 所以3.5还是必须安装的
-TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache libncurses5-dev"
+TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache libncurses5-dev tmux"
 
 DEBIAN=`uname -a | grep -i "debian\|ubuntu"`
 if [ -n "$DEBIAN" ]; then
@@ -86,7 +86,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache coreutils bash
+    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache coreutils bash tmux
     unset LINUX
     cp screenrc_osx_config ~/.screenrc
 
@@ -96,8 +96,8 @@ if [ -n "$DARWIN" ]; then
 fi
 
 cp emacs_config ~/.emacs
-
 cp gitconfig_config ~/.gitconfig
+cp tmux_config ~/.tmux.conf
 
 # 下面用wget获取最新的
 # cp google-c-style.el $LIJIEPATH
@@ -108,7 +108,7 @@ mkdir -p deps
 
 cd deps
 
-GOVER=1.7.1
+GOVER=1.7.4
 
 # install Go
 GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
@@ -178,8 +178,8 @@ gitget "https://github.com/jwiegley/emacs-async.git async" async
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
 if [ -n "$DARWIN" ]; then
-    sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
-    sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+    sed -i "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+    sed -i "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
 else
     sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
     sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
