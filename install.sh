@@ -252,3 +252,5 @@ wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.3.tar.gz global-6.5.3.tar.gz
 
 # rust-lang
 # wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
+
+cp -p create_cpp_project $PREFIX/bin
