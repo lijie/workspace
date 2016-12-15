@@ -79,7 +79,8 @@ DEBIAN=`uname -a | grep -i "debian\|ubuntu"`
 if [ -n "$DEBIAN" ]; then
     aptget $TOOLS
     cp screenrc_config ~/.screenrc
-
+    cp tmux_config ~/.tmux.conf
+    
     SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
     [ -z "$SETBASHRC" ] && echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
 fi
@@ -89,6 +90,7 @@ if [ -n "$DARWIN" ]; then
     sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache coreutils bash tmux
     unset LINUX
     cp screenrc_osx_config ~/.screenrc
+    cp tmux_osx_config ~/.tmux.conf
 
     sed -i '' '/my_bashrc/d' ~/.bashrc
     SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
@@ -97,7 +99,6 @@ fi
 
 cp emacs_config ~/.emacs
 cp gitconfig_config ~/.gitconfig
-cp tmux_config ~/.tmux.conf
 
 # 下面用wget获取最新的
 # cp google-c-style.el $LIJIEPATH
