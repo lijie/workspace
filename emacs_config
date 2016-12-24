@@ -483,3 +483,4 @@ occurence of CHAR."
 ;;(setq url-proxy-services '(("no_proxy" . "oa\\.com")
 ;;			   ("https" . "dev-proxy.oa.com:8080")
 ;;			   ("http" . "dev-proxy.oa.com:8080")))
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
