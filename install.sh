@@ -87,7 +87,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port install emacs cmake screen git subversion wget the_silver_searcher Bear distcc ccache coreutils bash tmux
+    sudo port -v install emacs cmake screen git wget the_silver_searcher distcc ccache coreutils bash tmux
     unset LINUX
     cp screenrc_osx_config ~/.screenrc
     cp tmux_osx_config ~/.tmux.conf
@@ -95,6 +95,8 @@ if [ -n "$DARWIN" ]; then
     sed -i '' '/my_bashrc/d' ~/.bashrc
     SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
     [ -z "$SETBASHRC" ] && echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
+
+    export PATH=/usr/local/go/bin:$PATH
 fi
 
 cp emacs_config ~/.emacs
@@ -179,8 +181,8 @@ gitget "https://github.com/jwiegley/emacs-async.git async" async
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
 if [ -n "$DARWIN" ]; then
-    sed -i "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
-    sed -i "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+    sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+    sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
 else
     sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
     sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
@@ -248,7 +250,7 @@ cp google-c-style.el $LIJIEPATH
 wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.3.tar.gz global-6.5.3.tar.gz
 [ ! -e global-6.5.3 ] && tar zxf global-6.5.3.tar.gz
 
-(cd global-6.5.3; ./configure --prefix=$PREFIX; make; make install)
+(cd global-6.5.3; ./configure --prefix=$PREFIX; make; sudo make install)
 
 # rust-lang
 # wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
