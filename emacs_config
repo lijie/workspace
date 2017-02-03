@@ -484,3 +484,7 @@ occurence of CHAR."
 ;;			   ("https" . "dev-proxy.oa.com:8080")
 ;;			   ("http" . "dev-proxy.oa.com:8080")))
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
+;; 自动gofmt
+(add-hook 'go-mode-hook '(lambda()
+			   (add-hook 'before-save-hook 'gofmt-before-save)))
