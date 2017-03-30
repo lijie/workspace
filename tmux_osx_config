@@ -3,5 +3,6 @@ set -g prefix C-l
 bind C-l send-prefix
 
 set-option -g history-limit 50000
+set-option -g default-command /opt/local/bin/bash
 set-option -g default-shell /opt/local/bin/bash
 

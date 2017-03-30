@@ -13,19 +13,12 @@ alias e="emacs"
 alias eq="emacs -Q"
 alias ex="open /Applications/Emacs.app"
 
-GOBINPATH=$1/deps/go/bin
-
 TMP=`echo $PATH | grep ${HOME}/opt/bin`
 if [ -z "$TMP" ]; then
     export PATH=${HOME}/opt/bin:$PATH
 fi
 
-TMP=`echo $PATH | grep $GOBINPATH`
-if [ -z "$TMP" ]; then
-    export PATH=$GOBINPATH:$PATH
-fi
-
 # 设置mackports到path
-export PATH=/opt/local/bin:$PATH
+export PATH=/usr/local/go/bin:/opt/local/bin:$PATH
 # 默认使用gnu coreutils
 export PATH=/opt/local/libexec/gnubin/:$PATH

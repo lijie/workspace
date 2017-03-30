@@ -11,6 +11,11 @@ alias a='ag -i'
 alias e="emacs"
 alias eq="emacs -Q"
 
+alias gx="global -x"
+alias gr="global -r"
+alias gf="global -f"
+alias gg="global -g"
+
 GOBINPATH=$1/deps/go/bin
 
 TMP=`echo $PATH | grep ${HOME}/opt/bin`
