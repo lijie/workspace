@@ -65,7 +65,7 @@
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "M-/") 'helm-dabbrev)
 (global-set-key (kbd "C-c i") 'helm-imenu)
-(global-set-key (kbd "C-c s") 'helm-ag)
+(global-set-key (kbd "C-c s") 'helm-do-ag)
 (global-set-key (kbd "C-c c") 'company-complete)
 (global-set-key (kbd "M-s s") 'helm-swoop)
 (global-set-key (kbd "C-s") 'isearch-forward)
