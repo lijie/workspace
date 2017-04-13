@@ -96,6 +96,8 @@
     (load "~/.lijie/google-c-style.el"))
 (load "~/.lijie/markdown-mode.el")
 (require 'go-mode-autoloads)
+(require 'go-guru)
+(require 'go-rename)
 
 ; emacs title
 (setq frame-title-format "emacs@%b")

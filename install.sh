@@ -31,7 +31,7 @@ wgetit()
 goget()
 {
     [ "$OFFLINE" == "1" ] && return
-    [ -e src/$1 ] && $GO get -u $1 || $GO get $1
+    [ -e src/$1 ] && go get -u $1 || go get $1
 }
 
 aptget()
@@ -92,7 +92,7 @@ if [ -n "$DARWIN" ]; then
     cp screenrc_osx_config ~/.screenrc
     cp tmux_osx_config ~/.tmux.conf
 
-    sed -i '' '/my_bashrc/d' ~/.bashrc
+    sed -i '/my_bashrc/d' ~/.bashrc
     SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
     [ -z "$SETBASHRC" ] && echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
 
@@ -111,67 +111,76 @@ mkdir -p deps
 
 cd deps
 
-GOVER=1.7.4
+install_go()
+{
+    GOVER=1.8.1
 
-# install Go
-GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
-# install Go1.4.3
-export CGO_ENABLED=0
-if [ -z "$GOVERSION" ]; then
-    if [ ! -e go1.4.3.src.tar.gz ]; then
-	wgetit https://storage.googleapis.com/golang/go1.4.3.src.tar.gz go1.4.3.src.tar.gz
+    # install Go
+    GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
+    # install Go1.4.3
+    export CGO_ENABLED=0
+    if [ -z "$GOVERSION" ]; then
+	if [ ! -e go1.4.3.src.tar.gz ]; then
+	    wgetit https://storage.googleapis.com/golang/go1.4.3.src.tar.gz go1.4.3.src.tar.gz
+	fi
+	if [ ! -e go1.4.3.src.tar.gz ]; then
+	    echo "download go1.4.3.src.tar.gz failed"
+	    exit 1
+	fi
+	if [ ! -d go1.4.3 ]; then
+	    tar zxf go1.4.3.src.tar.gz
+	    mv go go1.4.3
+	fi
+	[ ! -e go1.4.3/bin/go ] && (cd go1.4.3/src/; ./make.bash)
     fi
-    if [ ! -e go1.4.3.src.tar.gz ]; then
-	echo "download go1.4.3.src.tar.gz failed"
-	exit 1
+    export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
+    unset CGO_ENABLED
+    # install Go
+    if [ -z "$GOVERSION" ]; then
+	if [ ! -e go${GOVER}.src.tar.gz ]; then
+	    wgetit https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz go${GOVER}.src.tar.gz
+	fi
+	if [ ! -e go${GOVER}.src.tar.gz ]; then
+	    echo "download go${GOVER}.src.tar.gz failed"
+	    exit 1
+	fi
+	if [ ! -d go${GOVER} ]; then
+	    tar zxf go${GOVER}.src.tar.gz
+	    mv go go${GOVER}
+	fi
+	ln -sf go${GOVER} go
+	[ ! -e go${GOVER}/bin/go ] && (cd go${GOVER}/src/; ./make.bash)
     fi
-    if [ ! -d go1.4.3 ]; then
-	tar zxf go1.4.3.src.tar.gz
-	mv go go1.4.3
-    fi
-    [ ! -e go1.4.3/bin/go ] && (cd go1.4.3/src/; ./make.bash)
+}
+
+if [ -z "$DARWIN" ]; then
+    install_go
+    GOBINPATH=`pwd`/go/bin
+    export PATH=$GOBINPATH:$PATH
 fi
-export GOROOT_BOOTSTRAP=`pwd`/go1.4.3
-unset CGO_ENABLED
-# install Go
-if [ -z "$GOVERSION" ]; then
-    if [ ! -e go${GOVER}.src.tar.gz ]; then
-	wgetit https://storage.googleapis.com/golang/go${GOVER}.src.tar.gz go${GOVER}.src.tar.gz
-    fi
-    if [ ! -e go${GOVER}.src.tar.gz ]; then
-	echo "download go${GOVER}.src.tar.gz failed"
-	exit 1
-    fi
-    if [ ! -d go${GOVER} ]; then
-	tar zxf go${GOVER}.src.tar.gz
-	mv go go${GOVER}
-    fi
-    ln -sf go${GOVER} go
-    [ ! -e go${GOVER}/bin/go ] && (cd go${GOVER}/src/; ./make.bash)
-fi
-GOBINPATH=`pwd`/go/bin
-export GO=${GOBINPATH}/go
-export PATH=$GOBINPATH:$PATH
 
 export GOPATH=`pwd`
 
 # install go mode for emacs
 gitget https://github.com/dominikh/go-mode.el go-mode.el
-cp go-mode.el/go-mode.el $LIJIEPATH
-cp go-mode.el/go-mode-autoloads.el $LIJIEPATH
+cp go-mode.el/*.el $LIJIEPATH
 
 # install godef
 goget github.com/rogpeppe/godef
 
-# install oracle tools
-goget golang.org/x/tools/cmd/oracle
+# install guru
+goget golang.org/x/tools/cmd/guru
+
+# install golint
+goget github.com/golang/lint/golint
 
 goget github.com/nsf/gocode
 cp src/github.com/nsf/gocode/emacs-company/*.el $LIJIEPATH
 
 cp bin/godef $PREFIX/bin
-cp bin/oracle $PREFIX/bin
 cp bin/gocode $PREFIX/bin
+cp bin/guru $PREFIX/bin
+cp bin/golint $PREFIX/bin
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
@@ -181,8 +190,8 @@ gitget "https://github.com/jwiegley/emacs-async.git async" async
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
 if [ -n "$DARWIN" ]; then
-    sed -i '' "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
-    sed -i '' "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+    sed -i "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+    sed -i "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
 else
     sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
     sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
