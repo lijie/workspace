@@ -12,11 +12,15 @@ alias a='ag -i'
 alias e="emacs"
 alias eq="emacs -Q"
 alias ex="open /Applications/Emacs.app"
+alias ec="emacsclient"
 
 TMP=`echo $PATH | grep ${HOME}/opt/bin`
 if [ -z "$TMP" ]; then
     export PATH=${HOME}/opt/bin:$PATH
 fi
+
+source ~/.lijie/completion.bash
+source ~/.lijie/key-bindings.bash
 
 # 设置mackports到path
 export PATH=/usr/local/go/bin:/opt/local/bin:$PATH

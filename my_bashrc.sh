@@ -18,6 +18,9 @@ alias gg="global -g"
 
 GOBINPATH=$1/deps/go/bin
 
+source ~/.lijie/completion.bash
+source ~/.lijie/key-bindings.bash
+
 TMP=`echo $PATH | grep ${HOME}/opt/bin`
 if [ -z "$TMP" ]; then
     export PATH=${HOME}/opt/bin:$PATH

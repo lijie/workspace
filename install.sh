@@ -73,7 +73,7 @@ LINUX=1
 # https://github.com/monochromegane/the_platinum_searcher
 
 # irony-mode 似乎不支持libclang3.6, 所以3.5还是必须安装的
-TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache libncurses5-dev tmux"
+TOOLS="emacs-nox gcc g++ gdb make cmake screen git wget systemtap subversion git-svn python2.7-minimal ack-grep silversearcher-ag clang libclang-dev libclang-3.5-dev bear libncurses5-dev distcc ccache libncurses5-dev tmux jq tig"
 
 DEBIAN=`uname -a | grep -i "debian\|ubuntu"`
 if [ -n "$DEBIAN" ]; then
@@ -87,7 +87,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port -v install emacs cmake screen git wget the_silver_searcher distcc ccache coreutils bash tmux
+    sudo port -v install emacs cmake screen git wget the_silver_searcher distcc ccache coreutils bash tmux jq tig
     unset LINUX
     cp screenrc_osx_config ~/.screenrc
     cp tmux_osx_config ~/.tmux.conf
@@ -168,6 +168,9 @@ cp go-mode.el/*.el $LIJIEPATH
 # install godef
 goget github.com/rogpeppe/godef
 
+# install fzf
+goget github.com/junegunn/fzf/src/fzf
+
 # install guru
 goget golang.org/x/tools/cmd/guru
 
@@ -181,6 +184,10 @@ cp bin/godef $PREFIX/bin
 cp bin/gocode $PREFIX/bin
 cp bin/guru $PREFIX/bin
 cp bin/golint $PREFIX/bin
+cp bin/fzf $PREFIX/bin
+
+cp deps/src/github.com/junegunn/fzf/shell/completion.bash $LIJIEPATH
+cp deps/src/github.com/junegunn/fzf/shell/key-bindings.bash $LIJIEPATH
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
