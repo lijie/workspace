@@ -30,6 +30,7 @@ wgetit()
 # $1 url
 goget()
 {
+    echo "go get:" $1
     [ "$OFFLINE" == "1" ] && return
     [ -e src/$1 ] && go get -u $1 || go get $1
 }
@@ -92,7 +93,7 @@ if [ -n "$DARWIN" ]; then
     cp screenrc_osx_config ~/.screenrc
     cp tmux_osx_config ~/.tmux.conf
 
-    sed -i '/my_bashrc/d' ~/.bashrc
+    gsed -i '/my_bashrc/d' ~/.bashrc
     SETBASHRC=`cat ~/.bashrc | grep my_osx_bashrc`
     [ -z "$SETBASHRC" ] && echo "source" $PWD/my_osx_bashrc.sh $PWD >> ~/.bashrc
 
@@ -197,8 +198,8 @@ gitget "https://github.com/jwiegley/emacs-async.git async" async
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
 if [ -n "$DARWIN" ]; then
-    sed -i "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
-    sed -i "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
+    gsed -i "s:replace_path_to_helm:${HELMDIR}:g" ~/.emacs
+    gsed -i "s:replace_path_to_async:${ASYNCDIR}:g" ~/.emacs
 else
     sed -i "s+replace_path_to_helm+${HELMDIR}+g" ~/.emacs
     sed -i "s+replace_path_to_async+${ASYNCDIR}+g" ~/.emacs
