@@ -32,6 +32,7 @@
 
 (add-hook 'c-mode-hook '(lambda ()(c-set-style "linux")))
 (add-hook 'c++-mode-hook 'google-set-c-style)
+(add-hook 'lua-mode-hook '(lambda() (setq lua-indent-level 4)))
 
 ;; 不再使用gtags-mode, 改用更为方便的helm-gtags-mode
 ;(add-hook 'c++-mode-hook '(lambda () (gtags-mode 1)))
