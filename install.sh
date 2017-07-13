@@ -170,7 +170,7 @@ cp go-mode.el/*.el $LIJIEPATH
 goget github.com/rogpeppe/godef
 
 # install fzf
-goget github.com/junegunn/fzf/src/fzf
+goget github.com/junegunn/fzf
 
 # install guru
 goget golang.org/x/tools/cmd/guru
@@ -187,13 +187,13 @@ cp bin/guru $PREFIX/bin
 cp bin/golint $PREFIX/bin
 cp bin/fzf $PREFIX/bin
 
-cp deps/src/github.com/junegunn/fzf/shell/completion.bash $LIJIEPATH
-cp deps/src/github.com/junegunn/fzf/shell/key-bindings.bash $LIJIEPATH
+cp src/github.com/junegunn/fzf/shell/completion.bash $LIJIEPATH
+cp src/github.com/junegunn/fzf/shell/key-bindings.bash $LIJIEPATH
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
 gitget "https://github.com/jwiegley/emacs-async.git async" async
-(cd helm; make)
+(cd helm; EMACSLOADPATH="`pwd`/../async:" make)
 
 HELMDIR=`pwd`/helm
 ASYNCDIR=`pwd`/async
@@ -264,10 +264,10 @@ cp google-c-style.el $LIJIEPATH
 
 # debian默认的global版本实在太老了
 # 自己编译一个较新的
-wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.3.tar.gz global-6.5.3.tar.gz
-[ ! -e global-6.5.3 ] && tar zxf global-6.5.3.tar.gz
+wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.7.tar.gz global-6.5.7.tar.gz
+[ ! -e global-6.5.7 ] && tar zxf global-6.5.7.tar.gz
 
-(cd global-6.5.3; ./configure --prefix=$PREFIX; make; sudo make install)
+(cd global-6.5.7; ./configure --prefix=$PREFIX; make; sudo make install)
 
 # rust-lang
 # wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
