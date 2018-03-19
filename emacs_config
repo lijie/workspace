@@ -491,3 +491,5 @@ occurence of CHAR."
 ;; 自动gofmt
 (add-hook 'go-mode-hook '(lambda()
 			   (add-hook 'before-save-hook 'gofmt-before-save)))
+;; auto revert
+(global-auto-revert-mode 1)

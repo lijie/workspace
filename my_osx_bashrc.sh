@@ -19,8 +19,8 @@ if [ -z "$TMP" ]; then
     export PATH=${HOME}/opt/bin:$PATH
 fi
 
-source ~/.lijie/completion.bash
-source ~/.lijie/key-bindings.bash
+source ~/.lijie/completion.zsh
+source ~/.lijie/key-bindings.zsh
 
 # 设置mackports到path
 export PATH=/usr/local/go/bin:/opt/local/bin:$PATH

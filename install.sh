@@ -88,7 +88,7 @@ fi
 
 DARWIN=`uname -a | grep -i darwin`
 if [ -n "$DARWIN" ]; then
-    sudo port -v install emacs cmake screen git wget the_silver_searcher distcc ccache coreutils bash tmux jq tig
+    sudo port -v install emacs cmake screen git wget the_silver_searcher distcc ccache coreutils bash tmux jq tig zsh zsh-completions
     unset LINUX
     cp screenrc_osx_config ~/.screenrc
     cp tmux_osx_config ~/.tmux.conf
@@ -189,6 +189,8 @@ cp bin/fzf $PREFIX/bin
 
 cp src/github.com/junegunn/fzf/shell/completion.bash $LIJIEPATH
 cp src/github.com/junegunn/fzf/shell/key-bindings.bash $LIJIEPATH
+cp src/github.com/junegunn/fzf/shell/completion.zsh $LIJIEPATH
+cp src/github.com/junegunn/fzf/shell/key-bindings.zsh $LIJIEPATH
 
 # install helm
 gitget "https://github.com/emacs-helm/helm.git helm" helm
