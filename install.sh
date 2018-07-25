@@ -266,10 +266,10 @@ cp google-c-style.el $LIJIEPATH
 
 # debian默认的global版本实在太老了
 # 自己编译一个较新的
-wgetit ftp://ftp.gnu.org/pub/gnu/global/global-6.5.7.tar.gz global-6.5.7.tar.gz
-[ ! -e global-6.5.7 ] && tar zxf global-6.5.7.tar.gz
+wgetit http://tamacom.com/global/global-6.6.2.tar.gz global-6.6.2.tar.gz
+[ ! -e global-6.6.2 ] && tar zxf global-6.6.2.tar.gz
 
-(cd global-6.5.7; ./configure --prefix=$PREFIX; make; sudo make install)
+(cd global-6.6.2; ./configure --prefix=$PREFIX; make; sudo make install)
 
 # rust-lang
 # wgetit https://static.rust-lang.org/dist/rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz rust-1.3.0-x86_64-unknown-linux-gnu.tar.gz
