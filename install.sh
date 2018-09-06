@@ -24,7 +24,7 @@ wgetit()
 {
     echo "wget:" $1
     [ "$OFFLINE" == "1" ] && return
-    [ ! -e $2 ] && wget --timeout=5 $1
+    [ ! -e $2 ] && wget --timeout=15 $1
 }
 
 # $1 url
@@ -83,7 +83,9 @@ if [ -n "$DEBIAN" ]; then
     cp tmux_config ~/.tmux.conf
     
     SETBASHRC=`cat ~/.bashrc | grep my_bashrc`
+    SETZSHRC=`cat ~/.zshrc | grep my_zshrc`
     [ -z "$SETBASHRC" ] && echo "source" $PWD/my_bashrc.sh $PWD >> ~/.bashrc
+    [ -z "$SETZSHRC" ] && echo "source" $PWD/my_zshrc.sh $PWD >> ~/.zshrc
 fi
 
 DARWIN=`uname -a | grep -i darwin`
@@ -114,7 +116,7 @@ cd deps
 
 install_go()
 {
-    GOVER=1.8.1
+    GOVER=1.11
 
     # install Go
     GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
