@@ -98,7 +98,8 @@
 (if (file-exists-p "~/.lijie/google-c-style.el")
     (load "~/.lijie/google-c-style.el"))
 (load "~/.lijie/markdown-mode.el")
-(require 'go-mode-autoloads)
+(autoload 'go-mode "go-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 (require 'go-guru)
 (require 'go-rename)
 
