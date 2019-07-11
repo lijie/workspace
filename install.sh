@@ -116,7 +116,7 @@ cd deps
 
 install_go()
 {
-    GOVER=1.11
+    GOVER=1.12.7
 
     # install Go
     GOVERSION=`go version | grep $GOVER | grep -v beta 2>/dev/null`
