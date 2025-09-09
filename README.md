@@ -39,3 +39,6 @@ gnu screen
 
 
 目前能运行在Debian8.0和OSX10.9+MacPorts上
+
+TODO:
+https://github.com/gokcehan/lf

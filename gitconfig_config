@@ -12,6 +12,7 @@
 	df = diff
 	dc = dif --cached
 	lg = log -p
+	logstat = log --stat
 	who = shortlog -s --
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all --color
 

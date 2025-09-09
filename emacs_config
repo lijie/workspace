@@ -2,14 +2,25 @@
 (setq tramp-ssh-controlmaster-options "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(c-strict-syntax-p t)
  '(c-tab-always-indent nil)
  '(column-number-mode t)
+ '(custom-safe-themes
+   '("d481904809c509641a1a1f1b1eb80b94c58c210145effc2631c1a7f2e4a2fdf4"
+     "dfcd2b13f10da4e5e26eb1281611e43a134d4400b06661445e7cbb183c47d2ec"
+     "6fc9e40b4375d9d8d0d9521505849ab4d04220ed470db0b78b700230da0a86c1"
+     "6bdc4e5f585bb4a500ea38f563ecf126570b9ab3be0598bdf607034bb07a8875"
+     "76ddb2e196c6ba8f380c23d169cf2c8f561fd2013ad54b987c516d3cabc00216"
+     default))
  '(history-file "~/emacs-history.el")
+ '(package-selected-packages
+   '(color-theme-sanityinc-tomorrow company find-file-in-project go-mode
+				    golden-ratio google-this lsp-java
+				    lsp-ui projectile))
  '(standard-indent 8)
  '(tool-bar-mode nil nil (tool-bar))
  '(transient-mark-mode t))
@@ -36,11 +47,6 @@
 			    (setq lua-indent-level 4)
 			    (setq-default indent-tabs-mode nil)))
 
-;; 不再使用gtags-mode, 改用更为方便的helm-gtags-mode
-;(add-hook 'c++-mode-hook '(lambda () (gtags-mode 1)))
-;(add-hook 'c-mode-hook '(lambda () (gtags-mode 1)))
-
-
 ;; keep silent
 (setq visible-bell nil)
 
@@ -64,22 +70,15 @@
 (global-set-key "\C-c\f"  'find-file-at-point)
 
 ;; use helm-M-x as default
-(global-set-key (kbd "M-x") 'helm-M-x)
+; (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "M-/") 'helm-dabbrev)
-(global-set-key (kbd "C-c i") 'helm-imenu)
-(global-set-key (kbd "C-c s") 'helm-do-ag)
+; (global-set-key (kbd "M-/") 'helm-dabbrev)
+; (global-set-key (kbd "C-c i") 'helm-imenu)
+; (global-set-key (kbd "C-c s") 'helm-do-ag)
 (global-set-key (kbd "C-c c") 'company-complete)
-(global-set-key (kbd "M-s s") 'helm-swoop)
 (global-set-key (kbd "C-s") 'isearch-forward)
 (global-set-key (kbd "C-c p") 'find-file-in-project)
-(global-set-key (kbd "C-c r") 'ffip-ivy-resume)
-
-;; 不再使用gtags.el, 改用helm-gtags.el
-;(global-set-key "\C-cgs"  'gtags-find-symbol)
-;(global-set-key "\C-cgr"  'gtags-find-rtag)
-;(global-set-key "\C-cgf"  'gtags-find-file)
-;(global-set-key "\C-cgt"  'gtags-find-tag)
+; (global-set-key (kbd "C-c r") 'ffip-ivy-resume)
 
 (setq-default kill-whole-line t)
 (setq align-to-tab-stop nil)
@@ -97,12 +96,73 @@
 (add-to-list 'load-path "~/.lijie" t)
 (if (file-exists-p "~/.lijie/google-c-style.el")
     (load "~/.lijie/google-c-style.el"))
-(load "~/.lijie/markdown-mode.el")
-(autoload 'go-mode "go-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-(require 'go-guru)
-(require 'go-rename)
+; (autoload 'go-mode "go-mode" nil t)
+; (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
+;; === lsp-mode start ===
+;; (require 'lsp-mode)
+;; (define-key lsp-mode-map (kbd "C-c e") lsp-command-map)
+
+(use-package lsp-mode
+  :ensure t
+  :defer t
+  :bind-keymap ("C-c e" . lsp-command-map)
+  :hook (go-mode . lsp)
+  :init
+  (setq lsp-go-gopls-path (executable-find "gopls"))
+  (setq lsp-file-watch-ignored
+      '("[/\\\\]gen-go-protos$" "[/\\\\]\\.git$")))
+
+;; (require 'lsp-ui)
+(use-package lsp-ui
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+;; (require 'go-mode)
+
+(use-package go-mode
+  :after lsp)
+
+;; (add-hook 'go-mode-hook #'lsp-deferred)
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+(lsp-register-custom-settings
+ '(("gopls.completeUnimported" t t)
+   ("gopls.staticcheck" t t)))
+
+;; (add-hook 'go-mode-hook 'subword-mode)
+;; (add-hook 'before-save-hook 'gofmt-before-save)
+
+;;(add-hook 'go-mode-hook (lambda ()
+;;                          (flycheck-add-next-checker 'lsp 'go-vet)
+;;                          (flycheck-add-next-checker 'lsp 'go-staticcheck)))
+;;
+(setq lsp-go-gopls-path (executable-find "gopls"))
+
+;; (require 'lsp-java)
+;; (add-hook 'java-mode-hook #'lsp)
+;; (setq lsp-java-java-path "/usr/lib/jvm/java-21-openjdk-21.0.8.0.9-1.tl3.x86_64/bin/java")
+
+;; (use-package lsp-java
+;;   :after lsp
+;;   :hook (java-mode-hook . lsp))
+
+;; === lsp-mode end ===
+
+;; projectile start
+(require 'projectile)
+(projectile-mode +1)
+;; Recommended keymap prefix on macOS
+;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+;; Recommended keymap prefix on Windows/Linux
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;; projectile end
+			  
 ; emacs title
 (setq frame-title-format "emacs@%b")
 
@@ -347,40 +407,6 @@ occurence of CHAR."
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-;; helm
-(add-to-list 'load-path "replace_path_to_helm")
-(add-to-list 'load-path "replace_path_to_async")
-(require 'helm-config)
-
-;; helm-gtags
-(load "~/.lijie/helm-gtags.el")
-(add-hook 'c++-mode-hook '(lambda () (helm-gtags-mode 1)))
-(add-hook 'c-mode-hook '(lambda () (helm-gtags-mode 1)))
-
-;; helm-gtags customize
-(custom-set-variables
- '(helm-gtags-path-style 'relative)
- '(helm-gtags-ignore-case t)
- '(helm-gtags-auto-update t))
-
-;; key binds for helm-gtags
-(eval-after-load "helm-gtags"
-  '(progn
-     (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-find-tag-other-window)
-     (define-key helm-gtags-mode-map (kbd "C-c g t") 'helm-gtags-find-tag-other-window)
-     (define-key helm-gtags-mode-map (kbd "C-c g r") 'helm-gtags-find-rtag)
-     (define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
-     (define-key helm-gtags-mode-map (kbd "C-c g f") 'helm-gtags-parse-file)
-     (define-key helm-gtags-mode-map (kbd "C-c g p") 'helm-gtags-previous-history)
-     (define-key helm-gtags-mode-map (kbd "C-c g n") 'helm-gtags-next-history)
-     (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-find-pattern)))
-
-;; helm-ag
-(load "~/.lijie/helm-ag.el")
-
-;; helm-swoop
-(load "~/.lijie/helm-swoop.el")
-
 ;; melpa
 (require 'package)
 (add-to-list 'package-archives
@@ -402,48 +428,18 @@ occurence of CHAR."
   (interactive)
   (compilation-start (concat "python ~/.lijie/cpplint.py " (buffer-file-name))))
 
-;; enable helm-mode
-;; helm 看起来很不错, 强化了很多emacs原来的功能
-(helm-mode 1)
-
-;; helm features:
-
-;; helm-mode: Allow turning on helm in all completions provided by emacs, when available you should use instead the same feature provided natively by helm.
-;; helm-find-files: Replace in one command all the files related commands (Bind it to C-x C-f!).
-;; helm-buffers-list: Enhanced buffers listing.
-;; helm-browse-project: Show all buffers and files related to project or current directory (Usable everywhere with helm-find-files) you will want to install helm-ls-git, helm-ls-hg and helm-ls-svn for a better experience.
-;; helm-dabbrev: Enhanced dabbrev with helm completion (Own implementation of dabbrev for helm, don't reuse emacs code).
-;; helm-moccur: Enhanced occur for one or more buffers, launch it from helm-buffers-list or current-buffer(Own implementation).
-;; helm-M-x: Enhanced version of execute-extended-command (Bind it to M-x!).
-;; helm-imenu and helm-imenu-in-all-buffers: Imenu in current-buffer or in all your buffers.
-;; helm-etags-select: Enhanced version of etags with helm-completion (Usable everywhere with helm-find-files).
-;; helm-apropos: Description of functions, variables, etc... Use it instead of Most C-h commands.
-;; Grep: You can launch it (recursively or not) from any files related helm commands, support as backends grep, ack-grep, git-grep, ag and pt (Own implementation).
-;; helm-gid: Helm interface to gid from id-utils.
-;; helm-show-kill-ring: A kill ring browser for helm.
-;; helm-all-mark-rings: A mark ring for helm, allow retrieving your last position(s) in a buffer.
-;; helm-filtered-bookmarks: An enhanced bookmark listing.
-;; helm-list-elisp-packages: Manage emacs packages with helm.
-
-;; 加载company-mode
-(load "~/.lijie/company.el")
-
 ;; 修改company-tooltips的前景色, 默认是黑色, 跟控制台背景重叠了
 (custom-set-faces
- '(company-preview
-   ((t (:foreground "darkgray" :underline t))))
- '(company-preview-common
-   ((t (:inherit company-preview))))
- '(company-tooltip
-   ((t (:background "lightgray" :foreground "black"))))
- '(company-tooltip-selection
-   ((t (:background "steelblue" :foreground "white"))))
- '(company-tooltip-common
-   ((((type x)) (:inherit company-tooltip :weight bold))
-    (t (:inherit company-tooltip))))
- '(company-tooltip-common-selection
-   ((((type x)) (:inherit company-tooltip-selection :weight bold))
-    (t (:inherit company-tooltip-selection)))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-preview ((t (:foreground "darkgray" :underline t))))
+ '(company-preview-common ((t (:inherit company-preview))))
+ '(company-tooltip ((t (:background "lightgray" :foreground "black"))))
+ '(company-tooltip-common ((((type x)) (:inherit company-tooltip :weight bold)) (t (:inherit company-tooltip))))
+ '(company-tooltip-common-selection ((((type x)) (:inherit company-tooltip-selection :weight bold)) (t (:inherit company-tooltip-selection))))
+ '(company-tooltip-selection ((t (:background "steelblue" :foreground "white")))))
 
 ;(custom-set-faces
 ; '(company-tooltip ((t (:foreground "white")))))
@@ -455,13 +451,13 @@ occurence of CHAR."
 (add-hook 'go-mode-hook 'company-mode)
 	  
 ;; 加载irony-mode
-(load "~/.lijie/irony.el")
-(load "~/.lijie/irony-cdb.el")
+;; (load "~/.lijie/irony.el")
+;; (load "~/.lijie/irony-cdb.el")
 
 ;; 在c/c++/objc下打开irony-mode
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'objc-mode-hook 'irony-mode)
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'objc-mode-hook 'irony-mode)
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
@@ -474,16 +470,16 @@ occurence of CHAR."
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
 ;; 将irony作为company的后端
-(load "~/.lijie/company-irony.el")
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-irony))
+;; (load "~/.lijie/company-irony.el")
+;; (eval-after-load 'company
+;;   '(add-to-list 'company-backends 'company-irony))
 
 ;; load company-go
-(load "~/.lijie/company-go.el")
+;; (load "~/.lijie/company-go.el")
 
 ;; 将gocode作为company的后端
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-go))
+;; (eval-after-load 'company
+;;   '(add-to-list 'company-backends 'company-go))
 
 ;; proxy for tencent dev env
 ;;(setq url-proxy-services '(("no_proxy" . "oa\\.com")
@@ -491,10 +487,226 @@ occurence of CHAR."
 ;;			   ("http" . "dev-proxy.oa.com:8080")))
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-;; 自动gofmt
-(add-hook 'go-mode-hook '(lambda()
-			   (add-hook 'before-save-hook 'gofmt-before-save)))
 ;; auto revert
 (global-auto-revert-mode 1)
 
 (setq clang-format-style-option "google")
+
+;; === vertico start ===
+
+;; Enable Vertico.
+(use-package vertico
+  :custom
+  ;; (vertico-scroll-margin 0) ;; Different scroll margin
+  ;; (vertico-count 20) ;; Show more candidates
+  ;; (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+  :init
+  (vertico-mode))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; Emacs minibuffer configurations.
+(use-package emacs
+  :custom
+  ;; Enable context menu. `vertico-multiform-mode' adds a menu in the minibuffer
+  ;; to switch display modes.
+  (context-menu-mode t)
+  ;; Support opening new minibuffers from inside existing minibuffers.
+  (enable-recursive-minibuffers t)
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt)))
+
+;; Optionally use the `orderless' completion style.
+(use-package orderless
+  :custom
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+
+;; === vertico end ===
+
+
+;; === consult start ===
+;; Example configuration for Consult
+(use-package consult
+  ;; Replace bindings. Lazily loaded by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g r" . consult-grep-match)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Tweak the register preview for `consult-register-load',
+  ;; `consult-register-store' and the built-in commands.  This improves the
+  ;; register formatting, adds thin separator lines, register sorting and hides
+  ;; the window mode line.
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq register-preview-delay 0.5)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+)
+;; === consult end ===
+
+
+;; === marginalia & embark start ===
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  ;; Show the Embark target at point via Eldoc. You may adjust the
+  ;; Eldoc strategy, if you want to see the documentation from
+  ;; multiple providers. Beware that using this can be a little
+  ;; jarring since the message shown in the minibuffer can be more
+  ;; than one line, causing the modeline to move up and down:
+
+  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+  ;; Add Embark to the mouse context menu. Also enable `context-menu-mode'.
+  ;; (context-menu-mode 1)
+  ;; (add-hook 'context-menu-functions #'embark-context-menu 100)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t ; only need to install it, embark loads it after consult if found
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+;; === marginalia & embark end ===
+
+
+;; === theme settings start ===
+ (color-theme-sanityinc-tomorrow-night)
+;; (load-theme 'doom-nova)
+;; === theme settings end ===
+
+(which-key-mode 1)
