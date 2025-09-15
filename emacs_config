@@ -9,6 +9,7 @@
  '(c-strict-syntax-p t)
  '(c-tab-always-indent nil)
  '(column-number-mode t)
+ '(custom-enabled-themes '(sanityinc-tomorrow-night))
  '(custom-safe-themes
    '("d481904809c509641a1a1f1b1eb80b94c58c210145effc2631c1a7f2e4a2fdf4"
      "dfcd2b13f10da4e5e26eb1281611e43a134d4400b06661445e7cbb183c47d2ec"
@@ -18,9 +19,16 @@
      default))
  '(history-file "~/emacs-history.el")
  '(package-selected-packages
-   '(color-theme-sanityinc-tomorrow company find-file-in-project go-mode
-				    golden-ratio google-this lsp-java
-				    lsp-ui projectile))
+   '(color-theme-sanityinc-tomorrow company consult-ag doom-themes
+				    embark-consult
+				    find-file-in-project go-mode
+				    golden-ratio google-this helm-ag
+				    helm-gtags lsp-java lsp-ui
+				    marginalia orderless treemacs-evil
+				    treemacs-icons-dired
+				    treemacs-magit treemacs-persp
+				    treemacs-projectile
+				    treemacs-tab-bar vertico))
  '(standard-indent 8)
  '(tool-bar-mode nil nil (tool-bar))
  '(transient-mark-mode t))
@@ -54,31 +62,35 @@
 (display-time)
 
 ;; key binding
-(global-set-key "\M-o" 'other-window)
+(global-set-key "\M-o" 'ace-window)
 (global-set-key "\C-c\C-c" 'comment-region)
-(global-set-key "\C-c\C-g" 'goto-line)
+;; (global-set-key "\C-c\C-g" 'goto-line)
+(global-set-key "\C-c\C-g" 'consult-goto-line)
 (global-set-key "\C-x\C-b" 'bs-show)
-;(global-set-key (kbd "C-x C-b") 'ibuffer-list-buffers)
+;; (global-set-key (kbd "C-x C-b") 'ibuffer-list-buffers)
 (global-set-key "\M-p"  'bs-cycle-previous)
 (global-set-key "\M-n"  'bs-cycle-next)
 (global-set-key "\M-a"  'beginning-of-line-text)
-; 不再使用speedbar, 似乎没啥用处...
-;(global-set-key "\C-c\h"  'speedbar-get-focus)
-;(global-set-key "\C-c\i"  'imenu)
-(global-set-key "\C-c\C-f"  'grep-find)
-(global-set-key "\C-c\l"  'align)
-(global-set-key "\C-c\f"  'find-file-at-point)
+;; 不再使用speedbar, 似乎没啥用处...
+;; (global-set-key "\C-c\h"  'speedbar-get-focus)
+;; C-c i 默认被consult占用了
+;; (global-set-key "\C-c\i"  'imenu)
+;; 使用consult-(rip)grep
+;; (global-set-key "\C-c\C-f"  'grep-find)
+;; 低频操作, 不绑定快捷键
+;; (global-set-key "\C-c\l"  'align)
+;; (global-set-key "\C-c\f"  'find-file-at-point)
 
 ;; use helm-M-x as default
 ; (global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+;; (global-set-key (kbd "C-x C-f") 'helm-find-files)
 ; (global-set-key (kbd "M-/") 'helm-dabbrev)
 ; (global-set-key (kbd "C-c i") 'helm-imenu)
 ; (global-set-key (kbd "C-c s") 'helm-do-ag)
 (global-set-key (kbd "C-c c") 'company-complete)
 (global-set-key (kbd "C-s") 'isearch-forward)
-(global-set-key (kbd "C-c p") 'find-file-in-project)
-; (global-set-key (kbd "C-c r") 'ffip-ivy-resume)
+;; (global-set-key (kbd "C-c p") 'find-file-in-project)
+;; (global-set-key (kbd "C-c r") 'ffip-ivy-resume)
 
 (setq-default kill-whole-line t)
 (setq align-to-tab-stop nil)
@@ -203,18 +215,20 @@
 ;;   (previous-line 3))
 ;; (define-key global-map (kbd "C-c d") 'insert-doxygen)
 
-
-(defun wy-go-to-char (n char)
-  "Move forward to Nth occurence of CHAR.
-Typing `wy-go-to-char-key' again will move forwad to the next Nth
-occurence of CHAR."
-  (interactive "p\ncGo to char: ")
-  (search-forward (string char) nil nil n)
-  (while (char-equal (read-char)
-		     char)
-    (search-forward (string char) nil nil n))
-  (setq unread-command-events (list last-input-event)))
-(define-key global-map (kbd "C-c a") 'wy-go-to-char)
+(require 'avy)
+(global-set-key (kbd "C-c a") 'avy-goto-char)
+;; 使用 avy-got-char
+;; (defun wy-go-to-char (n char)
+;;   "Move forward to Nth occurence of CHAR.
+;; Typing `wy-go-to-char-key' again will move forwad to the next Nth
+;; occurence of CHAR."
+;;   (interactive "p\ncGo to char: ")
+;;   (search-forward (string char) nil nil n)
+;;   (while (char-equal (read-char)
+;; 		     char)
+;;     (search-forward (string char) nil nil n))
+;;   (setq unread-command-events (list last-input-event)))
+;; (define-key global-map (kbd "C-c a") 'wy-go-to-char)
 
 
 ;;;;;;;;;;;;;;;;;;;;; move line ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -418,9 +432,9 @@ occurence of CHAR."
 	     '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (package-initialize)
 
-;; golden-ratio
-(require 'golden-ratio)
-(golden-ratio-mode 1)
+;; golden-ratio, 跟 ace-window 不兼容?
+;; (require 'golden-ratio)
+;; (golden-ratio-mode 1)
 
 ;; google c++ style check
 (defun cpplint ()
@@ -502,7 +516,9 @@ occurence of CHAR."
   ;; (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
   (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
   :init
-  (vertico-mode))
+  (vertico-mode)
+  ;;(vertico-buffer-mode)
+  )
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
@@ -666,7 +682,7 @@ occurence of CHAR."
   :ensure t
 
   :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
+  (("C-i" . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
@@ -710,3 +726,125 @@ occurence of CHAR."
 ;; === theme settings end ===
 
 (which-key-mode 1)
+
+;; === start treemacs ===
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-buffer-name-function            #'treemacs-default-buffer-name
+          treemacs-buffer-name-prefix              " *Treemacs-Buffer-"
+          treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay        0.5
+          treemacs-directory-name-transformer      #'identity
+          treemacs-display-in-side-window          t
+          treemacs-eldoc-display                   'simple
+          treemacs-file-event-delay                2000
+          treemacs-file-extension-regex            treemacs-last-period-regex-value
+          treemacs-file-follow-delay               0.2
+          treemacs-file-name-transformer           #'identity
+          treemacs-follow-after-init               t
+          treemacs-expand-after-init               t
+          treemacs-find-workspace-method           'find-for-file-or-pick-first
+          treemacs-git-command-pipe                ""
+          treemacs-goto-tag-strategy               'refetch-index
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-hide-dot-git-directory          t
+          treemacs-indentation                     2
+          treemacs-indentation-string              " "
+          treemacs-is-never-other-window           nil
+          treemacs-max-git-entries                 5000
+          treemacs-missing-project-action          'ask
+          treemacs-move-files-by-mouse-dragging    t
+          treemacs-move-forward-on-expand          nil
+          treemacs-no-png-images                   nil
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                        'left
+          treemacs-read-string-input               'from-child-frame
+          treemacs-recenter-distance               0.1
+          treemacs-recenter-after-file-follow      nil
+          treemacs-recenter-after-tag-follow       nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-recenter-after-project-expand   'on-distance
+          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-sorting                         'alphabetic-asc
+          treemacs-select-when-already-in-treemacs 'move-back
+          treemacs-space-between-root-nodes        t
+          treemacs-tag-follow-cleanup              t
+          treemacs-tag-follow-delay                1.5
+          treemacs-text-scale                      nil
+          treemacs-user-mode-line-format           nil
+          treemacs-user-header-line-format         nil
+          treemacs-wide-toggle-width               70
+          treemacs-width                           35
+          treemacs-width-increment                 1
+          treemacs-width-is-initially-locked       t
+          treemacs-workspace-switch-cleanup        nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :ensure t
+  :config (treemacs-set-scope-type 'Tabs))
+
+(treemacs-start-on-boot)
+;; === end treemacs ===

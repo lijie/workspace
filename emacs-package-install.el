@@ -34,3 +34,5 @@
 
 (package-install 'color-theme-sanityinc-tomorrow)
 (package-install 'doom-themes)
+(package-install 'treemacs)
+(package-install 'lsp-treemacs)
