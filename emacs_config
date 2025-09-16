@@ -28,7 +28,8 @@
 				    treemacs-icons-dired
 				    treemacs-magit treemacs-persp
 				    treemacs-projectile
-				    treemacs-tab-bar vertico))
+				    treemacs-tab-bar vertico vterm
+				    whole-line-or-region))
  '(standard-indent 8)
  '(tool-bar-mode nil nil (tool-bar))
  '(transient-mark-mode t))
@@ -848,3 +849,7 @@
 
 (treemacs-start-on-boot)
 ;; === end treemacs ===
+
+;; 没有region时, 复制/删除针对当前行
+(require 'whole-line-or-region)
+(whole-line-or-region-global-mode)

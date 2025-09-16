@@ -36,3 +36,5 @@
 (package-install 'doom-themes)
 (package-install 'treemacs)
 (package-install 'lsp-treemacs)
+(package-install 'vterm)
+(package-install 'whole-line-or-region)
