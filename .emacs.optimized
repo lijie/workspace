@@ -1,0 +1,506 @@
+;;; .emacs.optimized --- Optimized Emacs Configuration -*- lexical-binding: t; -*-
+
+;; ============================================================
+;; 启动性能优化: 提高 GC 阈值, 启动完成后恢复
+;; ============================================================
+(setq gc-cons-threshold (* 50 1024 1024)   ;; 50MB
+      gc-cons-percentage 0.6)
+
+;; 绕过 emacs24.5 的 tramp 导致启动速度非常缓慢的 bug
+(setq tramp-ssh-controlmaster-options
+      "-o ControlMaster=auto -o ControlPath='tramp.%%C' -o ControlPersist=no")
+
+;; ============================================================
+;; 包管理 (放在最前面, 确保后续 use-package 能正常工作)
+;; ============================================================
+(require 'package)
+(setq package-archives
+      '(("gnu"          . "https://elpa.gnu.org/packages/")
+        ("melpa"        . "https://melpa.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")))
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t
+      use-package-always-defer t)  ;; 默认懒加载
+
+;; ============================================================
+;; 基础设置
+;; ============================================================
+(setq inhibit-startup-message t
+      visible-bell nil
+      make-backup-files nil
+      frame-title-format "emacs@%b"
+      default-fill-column 120
+      kill-whole-line t
+      align-to-tab-stop nil
+      compile-command "make -k")
+
+(setq-default line-spacing 4
+              tab-width 8
+              indent-tabs-mode t)
+
+;; 显示时间和列号
+(display-time)
+(column-number-mode t)
+
+;; 括号匹配
+(show-paren-mode t)
+(setq show-paren-style 'parentheses)
+
+;; 高亮选区
+(transient-mark-mode t)
+
+;; 文件外部变更时自动刷新
+(global-auto-revert-mode 1)
+
+;; 不使用 vc-mode (太慢), 但保留 Git 后端给 treemacs/magit 用
+(setq vc-handled-backends '(Git))
+
+;; ============================================================
+;; 编程语言: C/C++/Lua
+;; ============================================================
+(add-hook 'c-mode-hook (lambda () (c-set-style "linux")))
+(add-hook 'c++-mode-hook 'google-set-c-style)
+(add-hook 'lua-mode-hook (lambda ()
+                           (setq lua-indent-level 4)
+                           (setq-default indent-tabs-mode nil)))
+
+;; .h 文件默认用 c++-mode
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
+;; google c++ style (从 ~/.lijie 加载)
+(add-to-list 'load-path "~/.lijie" t)
+(when (file-exists-p "~/.lijie/google-c-style.el")
+  (load "~/.lijie/google-c-style.el"))
+
+(setq clang-format-style-option "google")
+
+;; ============================================================
+;; LSP (懒加载, 进入 go-mode 时才启动)
+;; ============================================================
+(use-package lsp-mode
+  :hook (go-mode . lsp)
+  :bind-keymap ("C-c e" . lsp-command-map)
+  :init
+  (setq lsp-go-gopls-path (executable-find "gopls")
+        lsp-file-watch-ignored '("[/\\\\]gen-go-protos$" "[/\\\\]\\.git$"))
+  :config
+  (lsp-register-custom-settings
+   '(("gopls.completeUnimported" t t)
+     ("gopls.staticcheck" t t))))
+
+(use-package lsp-ui
+  :after lsp-mode
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+
+(use-package go-mode
+  :after lsp-mode
+  :hook (go-mode . (lambda ()
+                     (add-hook 'before-save-hook #'lsp-format-buffer t t)
+                     (add-hook 'before-save-hook #'lsp-organize-imports t t))))
+
+;; ============================================================
+;; 补全: company-mode (可日后替换为 corfu)
+;; ============================================================
+(use-package company
+  :hook ((c-mode c++-mode objc-mode go-mode) . company-mode)
+  :bind ("C-c c" . company-complete)
+  :custom-face
+  (company-preview ((t (:foreground "darkgray" :underline t))))
+  (company-preview-common ((t (:inherit company-preview))))
+  (company-tooltip ((t (:background "lightgray" :foreground "black"))))
+  (company-tooltip-common ((((type x)) (:inherit company-tooltip :weight bold))
+                           (t (:inherit company-tooltip))))
+  (company-tooltip-common-selection ((((type x)) (:inherit company-tooltip-selection :weight bold))
+                                     (t (:inherit company-tooltip-selection))))
+  (company-tooltip-selection ((t (:background "steelblue" :foreground "white")))))
+
+;; ============================================================
+;; Vertico 生态: 迷你缓冲区补全
+;; ============================================================
+(use-package vertico
+  :demand t  ;; 立即加载, 核心 UI
+  :custom (vertico-cycle t)
+  :init (vertico-mode))
+
+(use-package savehist
+  :ensure nil  ;; 内置
+  :demand t
+  :init (savehist-mode))
+
+(use-package orderless
+  :demand t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package emacs
+  :ensure nil
+  :custom
+  (context-menu-mode t)
+  (enable-recursive-minibuffers t)
+  (read-extended-command-predicate #'command-completion-default-include-p)
+  (minibuffer-prompt-properties
+   '(read-only t cursor-intangible t face minibuffer-prompt)))
+
+;; ============================================================
+;; Consult: 增强搜索与导航
+;; ============================================================
+(use-package consult
+  :demand t
+  :bind (;; C-c bindings
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h"   . consult-history)
+         ("C-c k"   . consult-kmacro)
+         ("C-c m"   . consult-man)
+         ("C-c i"   . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings
+         ("C-x M-:" . consult-complex-command)
+         ("C-x b"   . consult-buffer)
+         ("C-x C-b" . consult-buffer)   ;; 替代 bs-show, 统一体验
+         ("C-x 4 b" . consult-buffer-other-window)
+         ("C-x 5 b" . consult-buffer-other-frame)
+         ("C-x t b" . consult-buffer-other-tab)
+         ("C-x r b" . consult-bookmark)
+         ("C-x p b" . consult-project-buffer)
+         ;; register
+         ("M-#"   . consult-register-load)
+         ("M-'"   . consult-register-store)
+         ("C-M-#" . consult-register)
+         ;; yank
+         ("M-y"   . consult-yank-pop)
+         ;; M-g goto
+         ("M-g e"   . consult-compile-error)
+         ("M-g f"   . consult-flymake)
+         ("M-g g"   . consult-goto-line)
+         ("M-g M-g" . consult-goto-line)
+         ("M-g o"   . consult-outline)
+         ("M-g m"   . consult-mark)
+         ("M-g k"   . consult-global-mark)
+         ("M-g i"   . consult-imenu)
+         ("M-g I"   . consult-imenu-multi)
+         ;; M-s search
+         ("M-s d" . consult-find)
+         ("M-s c" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ("M-s e" . consult-isearch-history)
+         ;; isearch integration
+         :map isearch-mode-map
+         ("M-e"   . consult-isearch-history)
+         ("M-s e" . consult-isearch-history)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ;; minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)
+         ("M-r" . consult-history))
+
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  :init
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq register-preview-delay 0.5
+        xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  :config
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep consult-man
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   :preview-key '(:debounce 0.4 any))
+  (setq consult-narrow-key "<"))
+
+;; ============================================================
+;; Marginalia & Embark
+;; ============================================================
+(use-package marginalia
+  :demand t
+  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
+  :init (marginalia-mode))
+
+(use-package embark
+  :bind (("C-."   . embark-act)      ;; 改用 C-. 避免 C-i/TAB 冲突
+         ("C-;"   . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
+;; ============================================================
+;; 项目管理: 内置 project.el (替代 projectile)
+;;
+;; 常用快捷键:
+;;   C-x p f  → project-find-file
+;;   C-x p g  → project-find-regexp
+;;   C-x p b  → consult-project-buffer (已通过 consult 绑定)
+;;   C-x p d  → project-find-dir
+;;   C-x p !  → project-shell-command
+;;   C-x p s  → project-shell
+;;
+;; 如果仍需 projectile, 取消下面的注释:
+;; (use-package projectile
+;;   :bind-keymap ("C-c p" . projectile-command-map)
+;;   :config (projectile-mode +1))
+;; ============================================================
+
+;; ============================================================
+;; 导航: avy + ace-window
+;; ============================================================
+(use-package avy
+  :bind ("C-c a" . avy-goto-char))
+
+(use-package ace-window
+  :bind ("M-o" . ace-window))
+
+;; ============================================================
+;; which-key: 按键提示
+;; ============================================================
+(use-package which-key
+  :defer 1
+  :config (which-key-mode 1))
+
+;; ============================================================
+;; Treemacs: 文件树侧边栏 (不再启动时打开)
+;; ============================================================
+(use-package treemacs
+  :bind (:map global-map
+              ("M-0"       . treemacs-select-window)
+              ("C-x t 1"   . treemacs-delete-other-windows)
+              ("C-x t t"   . treemacs)
+              ("C-x t d"   . treemacs-select-directory)
+              ("C-x t B"   . treemacs-bookmark)
+              ("C-x t C-t" . treemacs-find-file)
+              ("C-x t M-t" . treemacs-find-tag))
+  :config
+  (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+        treemacs-deferred-git-apply-delay        0.5
+        treemacs-directory-name-transformer      #'identity
+        treemacs-display-in-side-window          t
+        treemacs-eldoc-display                   'simple
+        treemacs-file-event-delay                2000
+        treemacs-file-extension-regex            treemacs-last-period-regex-value
+        treemacs-file-follow-delay               0.2
+        treemacs-file-name-transformer           #'identity
+        treemacs-follow-after-init               t
+        treemacs-expand-after-init               t
+        treemacs-find-workspace-method           'find-for-file-or-pick-first
+        treemacs-git-command-pipe                ""
+        treemacs-goto-tag-strategy               'refetch-index
+        treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+        treemacs-hide-dot-git-directory          t
+        treemacs-indentation                     2
+        treemacs-indentation-string              " "
+        treemacs-is-never-other-window           nil
+        treemacs-max-git-entries                 5000
+        treemacs-missing-project-action          'ask
+        treemacs-move-files-by-mouse-dragging    t
+        treemacs-move-forward-on-expand          nil
+        treemacs-no-png-images                   nil
+        treemacs-no-delete-other-windows         t
+        treemacs-project-follow-cleanup          nil
+        treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+        treemacs-position                        'left
+        treemacs-read-string-input               'from-child-frame
+        treemacs-recenter-distance               0.1
+        treemacs-recenter-after-file-follow      nil
+        treemacs-recenter-after-tag-follow       nil
+        treemacs-recenter-after-project-jump     'always
+        treemacs-recenter-after-project-expand   'on-distance
+        treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+        treemacs-project-follow-into-home        nil
+        treemacs-show-cursor                     nil
+        treemacs-show-hidden-files               t
+        treemacs-silent-filewatch                nil
+        treemacs-silent-refresh                  nil
+        treemacs-sorting                         'alphabetic-asc
+        treemacs-select-when-already-in-treemacs 'move-back
+        treemacs-space-between-root-nodes        t
+        treemacs-tag-follow-cleanup              t
+        treemacs-tag-follow-delay                1.5
+        treemacs-text-scale                      nil
+        treemacs-user-mode-line-format           nil
+        treemacs-user-header-line-format         nil
+        treemacs-wide-toggle-width               70
+        treemacs-width                           35
+        treemacs-width-increment                 1
+        treemacs-width-is-initially-locked       t
+        treemacs-workspace-switch-cleanup        nil)
+
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode t)
+  (treemacs-fringe-indicator-mode 'always)
+  (when treemacs-python-executable
+    (treemacs-git-commit-diff-mode t))
+
+  (pcase (cons (not (null (executable-find "git")))
+               (not (null treemacs-python-executable)))
+    (`(t . t) (treemacs-git-mode 'deferred))
+    (`(t . _) (treemacs-git-mode 'simple)))
+
+  (treemacs-hide-gitignored-files-mode nil))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
+
+(use-package treemacs-magit
+  :after (treemacs magit))
+
+;; ============================================================
+;; 行操作: move-text (替代手写的 my-move-line-up/down)
+;; ============================================================
+(use-package move-text
+  :bind (([C-S-up]   . move-text-up)
+         ([C-S-down] . move-text-down)))
+
+;; 复制当前行到下一行
+(defun my-dup-line-down ()
+  "Duplicate current line below."
+  (interactive)
+  (let ((col (current-column)))
+    (save-excursion
+      (let ((line (buffer-substring (line-beginning-position) (line-end-position))))
+        (end-of-line)
+        (newline)
+        (insert line)))
+    (forward-line 1)
+    (move-to-column col)))
+(global-set-key [C-M-down] 'my-dup-line-down)
+
+;; 没有 region 时, 复制/删除针对当前行
+(use-package whole-line-or-region
+  :defer 1
+  :config (whole-line-or-region-global-mode))
+
+;; ============================================================
+;; 其他快捷键
+;; ============================================================
+
+;; 注释
+(global-set-key "\C-c\C-c" 'comment-region)
+;; goto line (consult 版)
+(global-set-key "\C-c\C-g" 'consult-goto-line)
+;; 行首文本
+(global-set-key "\M-a" 'beginning-of-line-text)
+;; isearch
+(global-set-key (kbd "C-s") 'isearch-forward)
+
+;; 窗口大小调整
+(global-set-key [C-M-left]  (lambda () (interactive) (enlarge-window 10)))
+(global-set-key [C-M-right] (lambda () (interactive) (enlarge-window-horizontally 10)))
+
+;; 编译
+(global-set-key (kbd "<f5>") 'compile)
+(global-set-key (kbd "<f6>") 'recompile)
+(global-set-key (kbd "<f8>") 'shell)
+
+;; 标记当前行
+(fset 'mark-one-line [?\C-a ?\C-@ end])
+(global-set-key "\C-c\C-m" 'mark-one-line)
+
+;; ============================================================
+;; 日历设置
+;; ============================================================
+(setq calendar-remove-frame-by-deleting t
+      calendar-week-start-day 1
+      mark-diary-entries-in-calendar t
+      mark-holidays-in-calendar t
+      view-calendar-holidays-initially nil)
+
+(setq christian-holidays nil
+      hebrew-holidays nil
+      islamic-holidays nil
+      solar-holidays nil
+      general-holidays '((holiday-float 5 0 2 "Mother's day")
+                         (holiday-fixed 6 1 "Children's day")
+                         (holiday-float 6 0 3 "Father's day")
+                         (holiday-fixed 9 28 "Sunday's birthday")))
+
+;; ============================================================
+;; Markdown
+;; ============================================================
+(use-package markdown-mode
+  :mode (("\\.text\\'"     . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)
+         ("\\.md\\'"       . markdown-mode)))
+
+;; ============================================================
+;; vterm
+;; ============================================================
+(use-package vterm)
+
+;; ============================================================
+;; 插入当前时间
+;; ============================================================
+(defun insert-current-time ()
+  "Insert current timestamp."
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time))))
+
+;; ============================================================
+;; 主题
+;; ============================================================
+(setq custom-safe-themes t)  ;; 信任所有主题, 避免启动时 "Really load?" 提示
+(use-package color-theme-sanityinc-tomorrow
+  :demand t
+  :config (color-theme-sanityinc-tomorrow-night))
+
+;; ============================================================
+;; Claude Code IDE
+;; ============================================================
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :defer 2
+  :config (claude-code-ide-emacs-tools-setup))
+
+;; ============================================================
+;; 启动完成: 恢复 GC, 报告启动时间
+;; ============================================================
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 2 1024 1024)
+                  gc-cons-percentage 0.1)
+            (message "Emacs started in %.2f seconds with %d garbage collections."
+                     (float-time (time-subtract after-init-time before-init-time))
+                     gcs-done)))
+
+;; ============================================================
+;; Custom 区域 (Emacs 自动生成, 勿手动编辑)
+;; ============================================================
+(custom-set-variables
+ '(c-strict-syntax-p t)
+ '(c-tab-always-indent nil)
+ '(package-selected-packages
+   '(ace-window avy claude-code-ide color-theme-sanityinc-tomorrow company
+     consult embark embark-consult go-mode lsp-mode lsp-ui marginalia
+     markdown-mode move-text orderless treemacs treemacs-icons-dired
+     treemacs-magit treemacs-projectile treemacs-tab-bar vertico vterm
+     which-key whole-line-or-region)))
+
+;;; .emacs.optimized ends here
