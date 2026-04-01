@@ -106,20 +106,26 @@
                      (add-hook 'before-save-hook #'lsp-organize-imports t t))))
 
 ;; ============================================================
-;; 补全: company-mode (可日后替换为 corfu)
+;; 补全: corfu + cape (替代 company, 与 Vertico 生态统一)
 ;; ============================================================
-(use-package company
-  :hook ((c-mode c++-mode objc-mode go-mode) . company-mode)
-  :bind ("C-c c" . company-complete)
-  :custom-face
-  (company-preview ((t (:foreground "darkgray" :underline t))))
-  (company-preview-common ((t (:inherit company-preview))))
-  (company-tooltip ((t (:background "lightgray" :foreground "black"))))
-  (company-tooltip-common ((((type x)) (:inherit company-tooltip :weight bold))
-                           (t (:inherit company-tooltip))))
-  (company-tooltip-common-selection ((((type x)) (:inherit company-tooltip-selection :weight bold))
-                                     (t (:inherit company-tooltip-selection))))
-  (company-tooltip-selection ((t (:background "steelblue" :foreground "white")))))
+(use-package corfu
+  :demand t
+  :custom
+  (corfu-auto t)           ;; 自动弹出补全
+  (corfu-auto-delay 0.2)   ;; 弹出延迟
+  (corfu-auto-prefix 2)    ;; 输入 2 个字符后触发
+  (corfu-cycle t)           ;; 循环候选
+  (corfu-preselect 'prompt) ;; 不自动选中第一个
+  :bind (:map corfu-map
+              ("C-c c" . corfu-complete))
+  :init (global-corfu-mode))
+
+(use-package cape
+  :demand t
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
 
 ;; ============================================================
 ;; Vertico 生态: 迷你缓冲区补全
@@ -251,6 +257,15 @@
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;; ============================================================
+;; wgrep: 在 grep 结果中批量编辑并保存回源文件
+;;
+;; 工作流: consult-ripgrep → embark-export (C-. E)
+;;         → C-c C-p 进入编辑 → 修改 → C-c C-c 保存
+;; ============================================================
+(use-package wgrep
+  :config (setq wgrep-auto-save-buffer t))
+
+;; ============================================================
 ;; 项目管理: 内置 project.el (替代 projectile)
 ;;
 ;; 常用快捷键:
@@ -275,6 +290,42 @@
 
 (use-package ace-window
   :bind ("M-o" . ace-window))
+
+;; ============================================================
+;; expand-region: 智能选区扩展
+;; ============================================================
+(use-package expand-region
+  :bind ("C-=" . er/expand-region))
+
+;; ============================================================
+;; vundo: 可视化 undo 树, 轻松回到任意历史状态
+;; ============================================================
+(use-package vundo
+  :bind ("C-x u" . vundo))
+
+;; ============================================================
+;; diff-hl: 侧边栏显示 Git 增/删/改标记
+;; ============================================================
+(use-package diff-hl
+  :hook ((after-init         . global-diff-hl-mode)
+         (dired-mode         . diff-hl-dired-mode)
+         (magit-post-refresh . diff-hl-magit-post-refresh)))
+
+;; ============================================================
+;; dape: DAP 调试器 (支持 delve/codelldb/cppdbg)
+;; ============================================================
+(use-package dape
+  :config
+  (setq dape-buffer-window-arrangement 'right))
+
+;; ============================================================
+;; helpful: 增强帮助系统, 显示源码和引用
+;; ============================================================
+(use-package helpful
+  :bind (("C-h f" . helpful-callable)
+         ("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)
+         ("C-h x" . helpful-command)))
 
 ;; ============================================================
 ;; which-key: 按键提示
@@ -497,10 +548,10 @@
  '(c-strict-syntax-p t)
  '(c-tab-always-indent nil)
  '(package-selected-packages
-   '(ace-window avy claude-code-ide color-theme-sanityinc-tomorrow company
-     consult embark embark-consult go-mode lsp-mode lsp-ui marginalia
-     markdown-mode move-text orderless treemacs treemacs-icons-dired
-     treemacs-magit treemacs-projectile treemacs-tab-bar vertico vterm
-     which-key whole-line-or-region)))
+   '(ace-window avy cape claude-code-ide color-theme-sanityinc-tomorrow corfu
+     consult dape diff-hl embark embark-consult expand-region go-mode helpful
+     lsp-mode lsp-ui marginalia markdown-mode move-text orderless treemacs
+     treemacs-icons-dired treemacs-magit treemacs-projectile treemacs-tab-bar
+     vertico vterm vundo wgrep which-key whole-line-or-region)))
 
 ;;; .emacs.optimized ends here
