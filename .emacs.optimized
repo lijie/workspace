@@ -233,6 +233,16 @@
    :preview-key '(:debounce 0.4 any))
   (setq consult-narrow-key "<"))
 
+;; consult-ripgrep 默认在 project 根目录
+;; wrap 一下, 设置参数为在当前目录, 并绑定到 C-c s, 这个是之前我使用ag的快捷键, 比较习惯了.
+(defun my-consult-ripgrep ()
+  (interactive)
+  (let ((current-prefix-arg 4)) ;; emulate C-u
+    (call-interactively 'consult-ripgrep) ;; invoke align-regexp interactively
+    )
+  )
+(global-set-key (kbd "C-c s") 'my-consult-ripgrep)
+
 ;; ============================================================
 ;; Marginalia & Embark
 ;; ============================================================
@@ -545,13 +555,20 @@
 ;; Custom 区域 (Emacs 自动生成, 勿手动编辑)
 ;; ============================================================
 (custom-set-variables
- '(c-strict-syntax-p t)
- '(c-tab-always-indent nil)
- '(package-selected-packages
-   '(ace-window avy cape claude-code-ide color-theme-sanityinc-tomorrow corfu
-     consult dape diff-hl embark embark-consult expand-region go-mode helpful
-     lsp-mode lsp-ui marginalia markdown-mode move-text orderless treemacs
-     treemacs-icons-dired treemacs-magit treemacs-projectile treemacs-tab-bar
-     vertico vterm vundo wgrep which-key whole-line-or-region)))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(sanityinc-tomorrow-night))
+ '(package-selected-packages nil)
+ '(package-vc-selected-packages
+   '((claude-code-ide :url
+		      "https://github.com/manzaltu/claude-code-ide.el"))))
 
 ;;; .emacs.optimized ends here
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
