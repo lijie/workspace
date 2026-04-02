@@ -798,6 +798,7 @@
     ;;(treemacs-resize-icons 44)
 
     (treemacs-follow-mode t)
+    (treemacs-project-follow-mode t)
     (treemacs-filewatch-mode t)
     (treemacs-fringe-indicator-mode 'always)
     (when treemacs-python-executable
@@ -853,3 +854,13 @@
 ;; 没有region时, 复制/删除针对当前行
 (require 'whole-line-or-region)
 (whole-line-or-region-global-mode)
+
+;; consult-ripgrep 默认在 project 根目录
+;; wrap 一下, 设置参数为在当前目录, 并绑定到 C-c s, 这个是之前我使用ag的快捷键, 比较习惯了.
+(defun my-consult-ripgrep ()
+  (interactive)
+  (let ((current-prefix-arg 4)) ;; emulate C-u
+    (call-interactively 'consult-ripgrep) ;; invoke align-regexp interactively
+    )
+  )
+(global-set-key (kbd "C-c s") 'my-consult-ripgrep)
