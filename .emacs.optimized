@@ -228,9 +228,22 @@
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep consult-man
    consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
    :preview-key '(:debounce 0.4 any))
+  ;; 兼容新版 consult: 内部 source 变量已改名或移除
+  ;; 旧名: consult--source-recent-file / consult--source-project-recent-file
+  ;; 新名: consult--source-recentf    / consult--source-project-recentf
+  ;; consult--source-file-register 已从新版中删除
+  ;; 用 boundp 过滤, 新旧版本均可正常工作
+  (let ((srcs (seq-filter #'boundp
+                           '(consult--source-bookmark
+                             consult--source-file-register
+                             consult--source-recent-file
+                             consult--source-recentf
+                             consult--source-project-recent-file
+                             consult--source-project-recentf))))
+    (when srcs
+      (apply #'consult-customize
+             (append srcs (list :preview-key '(:debounce 0.4 any))))))
   (setq consult-narrow-key "<"))
 
 ;; consult-ripgrep 默认在 project 根目录
