@@ -234,6 +234,7 @@
   ;; 新名: consult--source-recentf    / consult--source-project-recentf
   ;; consult--source-file-register 已从新版中删除
   ;; 用 boundp 过滤, 新旧版本均可正常工作
+  ;; 注意: consult-customize 是宏, 不能用 apply/funcall, 需要 eval
   (let ((srcs (seq-filter #'boundp
                            '(consult--source-bookmark
                              consult--source-file-register
@@ -242,8 +243,7 @@
                              consult--source-project-recent-file
                              consult--source-project-recentf))))
     (when srcs
-      (apply #'consult-customize
-             (append srcs (list :preview-key '(:debounce 0.4 any))))))
+      (eval `(consult-customize ,@srcs :preview-key '(:debounce 0.4 any)))))
   (setq consult-narrow-key "<"))
 
 ;; consult-ripgrep 默认在 project 根目录
@@ -573,7 +573,14 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(sanityinc-tomorrow-night))
- '(package-selected-packages nil)
+ '(package-selected-packages
+   '(cape claude-code-ide color-theme-sanityinc-tomorrow company corfu
+	  dape diff-hl doom-themes embark-consult expand-region
+	  find-file-in-project go-mode golden-ratio google-this
+	  helpful lsp-java lsp-ui marginalia move-text orderless
+	  treemacs-evil treemacs-icons-dired treemacs-magit
+	  treemacs-persp treemacs-projectile treemacs-tab-bar vertico
+	  vterm vundo wgrep whole-line-or-region))
  '(package-vc-selected-packages
    '((claude-code-ide :url
 		      "https://github.com/manzaltu/claude-code-ide.el"))))
